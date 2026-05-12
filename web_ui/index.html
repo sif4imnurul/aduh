@@ -576,11 +576,13 @@
     let s2TxCount = 0;
     let s2MutCount = 0;
     let s2ProtCount = 0;
+    let s2TotalExpected = 0;
 
     // Agent 3 counters
     let totEnergy = 0;
     let totCo2 = 0;
     let endpointsCount = 0;
+    let s3TotalExpected = 0;
 
     // Lock the left card's height to the right card's initial height
     window.addEventListener('DOMContentLoaded', () => {
@@ -647,6 +649,7 @@
       s2TxCount = 0;
       s2MutCount = 0;
       s2ProtCount = 0;
+      s2TotalExpected = 0;
 
       // Reset Agent 3
       document.getElementById('s3-console').classList.add('hidden');
@@ -655,6 +658,7 @@
       totEnergy = 0;
       totCo2 = 0;
       endpointsCount = 0;
+      s3TotalExpected = 0;
 
       try {
         const response = await fetch('/api/run-pipeline', {
@@ -690,16 +694,33 @@
 
               // Identify steps
               if (data.includes('Agent 1')) {
-                updateStep(1, 'active', 'Memindai kerangka proyek...');
+                const msg = data.replace(/\[Agent 1\]\s*/i, '').replace(/▶|✅|❌|⏭/g, '').trim();
+                updateStep(1, 'active', msg || 'Memindai kerangka proyek...');
               } else if (data.includes('Agent 2')) {
                 updateStep(1, 'done');
-                updateStep(2, 'active', 'Mengirim konteks ke AI...');
                 document.getElementById('s2-console').classList.remove('hidden');
+                
+                const foundMatch = data.match(/Found (\d+) routes/);
+                if (foundMatch) {
+                    s2TotalExpected = parseInt(foundMatch[1]);
+                }
+
+                const msg = data.replace(/\[Agent 2\]\s*/i, '').replace(/\[DEBUG\]\s*/i, '').replace(/▶|✅|❌|⏭/g, '').trim();
+                if (msg && !msg.includes('AGENT2-TX')) {
+                   updateStep(2, 'active', msg);
+                } else if (!document.getElementById('s2-msg').innerText.includes('Mendeteksi')) {
+                   updateStep(2, 'active', 'Mengirim konteks ke AI...');
+                }
               } else if (data.includes('Agent 3')) {
                 updateStep(2, 'done');
                 updateStep(3, 'active', 'Menguji endpoint...');
                 document.getElementById('s3-console').classList.remove('hidden');
                 document.getElementById('s2-summary').classList.remove('hidden');
+                
+                const runningMatch = data.match(/Running (\d+) transactions/);
+                if (runningMatch) {
+                    s3TotalExpected = parseInt(runningMatch[1]);
+                }
               } else if (data.includes('Agent 4')) {
                 updateStep(3, 'done');
                 updateStep(4, 'active', 'Menyusun laporan akhir...');
@@ -720,7 +741,8 @@
                 if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) s2MutCount++;
                 if (csrf === 'yes') s2ProtCount++;
 
-                document.getElementById('s2-msg').innerHTML = `<span class="spinner"></span> Mendeteksi endpoint (${s2TxCount})...`;
+                const progressText = s2TotalExpected > 0 ? `(${s2TxCount}/${s2TotalExpected})` : `(${s2TxCount})`;
+                document.getElementById('s2-msg').innerHTML = `<span class="spinner"></span> Mendeteksi endpoint ${progressText}...`;
                 document.getElementById('s2-tot-count').innerText = s2TxCount;
                 document.getElementById('s2-tot-mut').innerText = s2MutCount;
                 document.getElementById('s2-tot-prot').innerText = s2ProtCount;
@@ -766,7 +788,8 @@
                 totCo2 += co2;
                 endpointsCount++;
 
-                document.getElementById(`s3-msg`).innerHTML = `<span class="spinner"></span> Menguji (${endpointsCount})...`;
+                const progressText = s3TotalExpected > 0 ? `(${endpointsCount}/${s3TotalExpected})` : `(${endpointsCount})`;
+                document.getElementById('s3-msg').innerHTML = `<span class="spinner"></span> Menguji ${progressText}...`;
                 document.getElementById('s3-tot-energy').innerText = totEnergy.toFixed(4);
                 document.getElementById('s3-tot-co2').innerText = totCo2.toFixed(5);
 

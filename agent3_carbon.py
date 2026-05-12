@@ -99,25 +99,32 @@ def get_csrf_token(
 
     for url in candidates:
         try:
+            print(f"[Agent 3] [DEBUG] Searching CSRF at: {url}", flush=True)
             r = session.get(url, timeout=REQUEST_TIMEOUT)
             if r.status_code == 200:
                 # 1. Check HTML for hidden input
                 token = extract_csrf_from_html(r.text, csrf_field_name)
                 if token:
+                    print(f"[Agent 3] [DEBUG] Found CSRF in HTML: {token[:10]}...", flush=True)
                     return token, True
 
                 # 2. Check cookies (XSRF-TOKEN style, e.g., Laravel Sanctum)
                 for cookie_name in ["XSRF-TOKEN", "csrftoken", "csrf_token"]:
                     if cookie_name in session.cookies:
+                        print(f"[Agent 3] [DEBUG] Found CSRF in cookies ({cookie_name})", flush=True)
                         import urllib.parse
                         return urllib.parse.unquote(session.cookies[cookie_name]), True
 
                 # 3. Check response headers
                 for header_name in ["X-CSRF-Token", "X-XSRF-Token", "CSRF-Token"]:
                     if header_name in r.headers:
+                        print(f"[Agent 3] [DEBUG] Found CSRF in headers ({header_name})", flush=True)
                         return r.headers[header_name], True
+            else:
+                print(f"[Agent 3] [DEBUG] HTTP {r.status_code} at {url}", flush=True)
 
-        except Exception:
+        except Exception as e:
+            print(f"[Agent 3] [DEBUG] CSRF check failed for {url}: {str(e)}", flush=True)
             continue
 
     return None, False
@@ -206,6 +213,7 @@ def run_transaction(
     # Get CSRF token if required
     if transaction.get("requires_csrf") and method in ["POST", "PUT", "PATCH", "DELETE"]:
         csrf_field = transaction.get("csrf_field_name", "_token")
+        print(f"[Agent 3] [DEBUG] Method {method} requires CSRF. Fetching...", flush=True)
         csrf_token, csrf_obtained = get_csrf_token(session, endpoint, csrf_field, framework)
 
         if csrf_token:
@@ -213,6 +221,8 @@ def run_transaction(
                 "X-CSRF-Token": csrf_token,
                 "X-XSRF-Token": csrf_token,
             })
+        else:
+            print(f"[Agent 3] [DEBUG] Warning: CSRF token not found for {endpoint}", flush=True)
 
     # Build payload
     payload = generate_dummy_payload(transaction.get("fields", []))
@@ -226,9 +236,11 @@ def run_transaction(
     start_time = time.time()
 
     try:
+        print(f"[Agent 3] [DEBUG] Executing {method} {full_url}", flush=True)
         if method == "GET":
             response = session.get(full_url, timeout=REQUEST_TIMEOUT)
         elif method == "POST":
+            print(f"[Agent 3] [DEBUG] Payload: {str(payload)[:100]}...", flush=True)
             response = session.post(full_url, data=payload, timeout=REQUEST_TIMEOUT)
         elif method == "PUT":
             response = session.put(full_url, data=payload, timeout=REQUEST_TIMEOUT)
@@ -306,6 +318,7 @@ def run(transactions_path: str) -> CarbonResult:
         })
 
         # Initialize CodeCarbon tracker
+        print(f"[Agent 3] [DEBUG] Initializing EmissionsTracker (project: code_carbon_agent)", flush=True)
         tracker = EmissionsTracker(
             project_name="code_carbon_agent",
             output_dir=str(Path(transactions_path).parent),

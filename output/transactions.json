@@ -1,82 +1,272 @@
 {
   "success": true,
-  "framework": "Flask",
-  "language": "Python",
+  "framework": "laravel",
+  "language": "PHP",
   "transactions": [
     {
       "id": "txn_001",
-      "method": "GET",
-      "endpoint": "/",
-      "description": "Serves the main web UI dashboard.",
+      "method": "POST",
+      "endpoint": "/api/chatbot/message",
+      "description": "Send a message to the chatbot",
       "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": "",
-      "fields": [],
-      "framework": "Flask",
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "message",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:500"
+          ]
+        },
+        {
+          "name": "conversation_id",
+          "type": "string",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "ulid"
+          ]
+        }
+      ],
+      "framework": "laravel",
       "tags": [
-        "ui",
-        "static"
+        "chatbot"
       ]
     },
     {
       "id": "txn_002",
-      "method": "GET",
-      "endpoint": "/api/transactions",
-      "description": "Retrieves the generated transactions.json file, containing identified routes and their details from a previous pipeline run.",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": "",
-      "fields": [],
-      "framework": "Flask",
+      "method": "POST",
+      "endpoint": "/data-requests",
+      "description": "Submit a new data request",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "company_name",
+          "type": "string",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "purpose_type",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "applicant_type",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "research_target_date",
+          "type": "date",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "date",
+            "after:today"
+          ]
+        }
+      ],
+      "framework": "laravel",
       "tags": [
-        "api",
-        "report"
+        "data-request"
       ]
     },
     {
       "id": "txn_003",
       "method": "POST",
-      "endpoint": "/api/run-pipeline",
-      "description": "Triggers the multi-agent code carbon analysis pipeline and streams execution logs via Server-Sent Events (SSE).",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": "",
+      "endpoint": "/admin/data-requests/{dataRequest}/verify",
+      "description": "Approve or reject a data request",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "source",
+          "name": "action",
           "type": "string",
           "required": true,
           "description": "",
           "validation_rules": [
-            "required"
+            "required",
+            "in:approve,reject"
           ]
         },
         {
-          "name": "base_url",
+          "name": "rejection_reason",
           "type": "string",
           "required": false,
           "description": "",
-          "validation_rules": []
-        },
-        {
-          "name": "skip_carbon",
-          "type": "boolean",
-          "required": false,
-          "description": "",
-          "validation_rules": []
+          "validation_rules": [
+            "required_if:action,reject",
+            "nullable",
+            "string",
+            "max:2000"
+          ]
         }
       ],
-      "framework": "Flask",
+      "framework": "laravel",
       "tags": [
-        "api",
-        "pipeline",
-        "admin"
+        "admin",
+        "data-request"
+      ]
+    },
+    {
+      "id": "txn_004",
+      "method": "POST",
+      "endpoint": "/admin/data-requests/{dataRequest}/verify-payment",
+      "description": "Verify payment proof",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:accept,reject"
+          ]
+        },
+        {
+          "name": "rejection_reason",
+          "type": "string",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "required_if:action,reject",
+            "nullable",
+            "string",
+            "max:1000"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "payment"
+      ]
+    },
+    {
+      "id": "txn_005",
+      "method": "POST",
+      "endpoint": "/data-requests/{dataRequest}/payment-proof",
+      "description": "Submit payment proof",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "file",
+            "mimes:pdf,jpg,jpeg,png"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "payment"
+      ]
+    },
+    {
+      "id": "txn_006",
+      "method": "POST",
+      "endpoint": "/admin/faqs/reorder",
+      "description": "Reorder FAQs",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "orders",
+          "type": "array",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "array"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "faq"
+      ]
+    },
+    {
+      "id": "txn_007",
+      "method": "POST",
+      "endpoint": "/admin/data-requests/{dataRequest}/processed-documents",
+      "description": "Store processed result documents",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "files",
+          "type": "array",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "array",
+            "max:10"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "data-request"
       ]
     }
   ],
-  "total_routes": 3,
-  "post_routes": 1,
-  "csrf_protected_routes": 0,
-  "auth_required_routes": 0,
+  "total_routes": 7,
+  "post_routes": 7,
+  "csrf_protected_routes": 7,
+  "auth_required_routes": 6,
   "error": null
 }

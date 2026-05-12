@@ -7,7 +7,7 @@ With streaming progress output (per-transaction display).
 import os
 import json
 import time
-import requests
+import google.generativeai as genai
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -16,12 +16,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_ENDPOINT = (
-    f"https://generativelanguage.googleapis.com/v1beta/models/"
-    f"gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
-)
+genai.configure(api_key=GEMINI_API_KEY)
 
-MAX_CONTENT_CHARS = 900_000
+MAX_CONTENT_CHARS = 90000000
 
 
 @dataclass
@@ -63,7 +60,8 @@ class IdentificationResult:
 SYSTEM_PROMPT = """
 You are an expert code analyzer. You will receive a flat bundle of a web application codebase.
 
-Your task is to analyze ALL routes/endpoints and return a STRICT JSON response.
+Your task is to analyze EVERY SINGLE route/endpoint defined in the code. Do not skip any.
+Be exhaustive. Scan all controller files and route definitions.
 
 ## What to extract per endpoint:
 1. HTTP method (GET, POST, PUT, PATCH, DELETE)
@@ -99,7 +97,11 @@ Your task is to analyze ALL routes/endpoints and return a STRICT JSON response.
 
 
 def chunk_content(content: str, max_chars: int) -> str:
+    total_lines = content.count("\n")
+    print(f"[Agent 2] [DEBUG] Original codebase size: {len(content)} chars, {total_lines} lines", flush=True)
+    
     if len(content) <= max_chars:
+        print(f"[Agent 2] [DEBUG] Content within limit, no chunking needed.", flush=True)
         return content
     
     lines = content.split("\n")
@@ -116,59 +118,70 @@ def chunk_content(content: str, max_chars: int) -> str:
         else:
             other_lines.append(line)
     
+    print(f"[Agent 2] [DEBUG] Keywords found in {len(priority_lines)} lines. Non-priority lines: {len(other_lines)}", flush=True)
+    
     result = "\n".join(priority_lines)
     if len(result) < max_chars:
         remaining = max_chars - len(result)
+        print(f"[Agent 2] [DEBUG] Adding {remaining} chars from non-priority lines...", flush=True)
         result += "\n" + "\n".join(other_lines)[:remaining]
     
+    final_chars = len(result)
+    print(f"[Agent 2] [DEBUG] Final context size: {final_chars} chars", flush=True)
     return result[:max_chars]
 
 
 def call_gemini(content: str) -> dict:
+    key_preview = f"{GEMINI_API_KEY[:6]}..." if GEMINI_API_KEY else "None"
+    print(f"[Agent 2] [DEBUG] API Key configured: {key_preview}", flush=True)
+    print(f"[Agent 2] [DEBUG] Initializing Gemini AI (Model: gemini-3.1-flash-lite)", flush=True)
     print(f"[Agent 2] Sending {len(content)} chars to Gemini AI...", flush=True)
     start_time = time.time()
     
-    payload = {
-        "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-        "contents": [{"parts": [{"text": f"Analyze this codebase:\n\n{content}"}]}],
-        "generationConfig": {
-            "temperature": 0.1,
-            "maxOutputTokens": 8192,
-            "responseMimeType": "application/json"
-        }
-    }
+    model = genai.GenerativeModel(
+        model_name="gemini-3.1-flash-lite",
+        system_instruction=SYSTEM_PROMPT
+    )
     
     for attempt in range(5):
         try:
-            response = requests.post(
-                GEMINI_ENDPOINT, json=payload,
-                headers={"Content-Type": "application/json"},
-                timeout=120
+            print(f"[Agent 2] [DEBUG] Generation attempt {attempt + 1}/5...", flush=True)
+            
+            response = model.generate_content(
+                f"Analyze this codebase:\n\n{content}",
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.1,
+                    max_output_tokens=8192,
+                    response_mime_type="application/json"
+                )
             )
             
-            if response.status_code in (429, 500, 502, 503):
-                wait_time = 30 * (attempt + 1)
-                print(f"[Agent 2] HTTP {response.status_code}, waiting {wait_time}s...", flush=True)
-                time.sleep(wait_time)
-                continue
-            
-            response.raise_for_status()
-            data = response.json()
-            raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            if raw_text.startswith("```"):
-                raw_text = "\n".join(raw_text.split("\n")[1:-1])
+            raw_text = response.text.strip()
+            print(f"[Agent 2] [DEBUG] Raw AI response length: {len(raw_text)} chars", flush=True)
             
             elapsed = time.time() - start_time
             print(f"[Agent 2] Gemini responded in {elapsed:.1f}s", flush=True)
-            return json.loads(raw_text)
+            
+            try:
+                parsed_json = json.loads(raw_text)
+                print(f"[Agent 2] [DEBUG] JSON validation successful.", flush=True)
+                return parsed_json
+            except json.JSONDecodeError as je:
+                print(f"[Agent 2] [ERROR] AI output is not valid JSON. Content snippet: {raw_text[:200]}...", flush=True)
+                raise je
         
-        except requests.exceptions.Timeout:
-            print(f"[Agent 2] Timeout attempt {attempt + 1}/5", flush=True)
-            time.sleep(10 * (attempt + 1))
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON: {e}")
+        except Exception as e:
+            print(f"[Agent 2] [DEBUG] Exception during AI call: {str(e)}", flush=True)
+            if "429" in str(e):
+                wait_time = 30 * (attempt + 1)
+                print(f"[Agent 2] [DEBUG] Rate limit hit. Waiting {wait_time}s...", flush=True)
+                time.sleep(wait_time)
+            elif attempt == 4:
+                raise e
+            else:
+                time.sleep(5)
     
-    raise RuntimeError("Gemini API failed after 5 attempts")
+    raise RuntimeError("Gemini AI failed after 5 attempts")
 
 
 def parse_result(raw: dict, framework_hint: str = "") -> IdentificationResult:

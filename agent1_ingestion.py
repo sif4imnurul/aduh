@@ -161,10 +161,12 @@ def run(source: str, output_dir: str = "./output") -> IngestionResult:
                 raise ValueError(f"Directory not found: {working_dir}")
 
         # Detect framework
+        print(f"[Agent 1] Menganalisis struktur proyek untuk deteksi framework...", flush=True)
         framework, language = detect_framework(working_dir)
-        print(f"[Agent 1] Detected: {framework} / {language}")
+        print(f"[Agent 1] Terdeteksi: {framework} ({language})", flush=True)
 
         # Run repomix
+        print(f"[Agent 1] Memulai proses pemaketan kode (Repomix)...", flush=True)
         run_repomix(working_dir, output_path)
 
         file_size = Path(output_path).stat().st_size
