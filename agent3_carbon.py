@@ -102,24 +102,36 @@ def get_csrf_token(
             print(f"[Agent 3] [DEBUG] Searching CSRF at: {url}", flush=True)
             r = session.get(url, timeout=REQUEST_TIMEOUT)
             if r.status_code == 200:
-                # 1. Check HTML for hidden input
+                # 1. Check HTML for hidden input (MUST be used for form fields)
                 token = extract_csrf_from_html(r.text, csrf_field_name)
                 if token:
-                    print(f"[Agent 3] [DEBUG] Found CSRF in HTML: {token[:10]}...", flush=True)
-                    return token, True
+                    # Laravel check: if it looks encrypted (eyJpdi...), it might be a wrong match from elsewhere
+                    if not token.startswith("eyJpdiI6"):
+                        print(f"[Agent 3] [DEBUG] Found valid CSRF in HTML: {token[:10]}...", flush=True)
+                        return token, True
 
-                # 2. Check cookies (XSRF-TOKEN style, e.g., Laravel Sanctum)
+                # 2. Check cookies (Only fallback if not found in HTML)
                 for cookie_name in ["XSRF-TOKEN", "csrftoken", "csrf_token"]:
                     if cookie_name in session.cookies:
-                        print(f"[Agent 3] [DEBUG] Found CSRF in cookies ({cookie_name})", flush=True)
+                        raw_cookie = session.cookies[cookie_name]
                         import urllib.parse
-                        return urllib.parse.unquote(session.cookies[cookie_name]), True
+                        decoded_cookie = urllib.parse.unquote(raw_cookie)
+                        
+                        # Laravel security: Encrypted cookies (eyJpdi...) cannot be used in body _token fields.
+                        # They only work as headers. We only return it if it looks like a plain string.
+                        if not decoded_cookie.startswith("eyJpdiI6"):
+                            print(f"[Agent 2] [DEBUG] Found plain CSRF in cookies ({cookie_name})", flush=True)
+                            return decoded_cookie, True
+                        else:
+                            print(f"[Agent 3] [DEBUG] Skipping encrypted cookie {cookie_name} for form field.", flush=True)
 
                 # 3. Check response headers
                 for header_name in ["X-CSRF-Token", "X-XSRF-Token", "CSRF-Token"]:
                     if header_name in r.headers:
-                        print(f"[Agent 3] [DEBUG] Found CSRF in headers ({header_name})", flush=True)
-                        return r.headers[header_name], True
+                        val = r.headers[header_name]
+                        if not val.startswith("eyJpdiI6"):
+                            print(f"[Agent 3] [DEBUG] Found CSRF in headers ({header_name})", flush=True)
+                            return val, True
             else:
                 print(f"[Agent 3] [DEBUG] HTTP {r.status_code} at {url}", flush=True)
 
@@ -205,42 +217,62 @@ def run_transaction(
     """Execute a single transaction with carbon tracking."""
     method = transaction["method"].upper()
     endpoint = transaction["endpoint"]
-    full_url = f"{BASE_URL}{endpoint}"
+    
+    print(f"\n[Agent 3] 🌀 ANALYZING TRANSACTION: {transaction['id']} ({method} {endpoint})", flush=True)
+    print(f"[Agent 3] ├─ Step 1: Discovering CSRF strategy for {framework}...", flush=True)
+
+    # Starting test signal for UI
+    print(f"[Agent 3] [AGENT3-START] {method} | {endpoint}", flush=True)
 
     csrf_obtained = False
-    csrf_token = None
+    csrf_token = getattr(session, "_cached_csrf_token", None)
 
-    # Get CSRF token if required
+    # Clean endpoint placeholders (e.g. /user/{id} -> /user/1)
+    endpoint = re.sub(r"\{[a-zA-Z0-9_]+\}", "1", endpoint)
+    full_url = f"{BASE_URL}{endpoint}"
+
+    # Get CSRF token if required and not cached
     if transaction.get("requires_csrf") and method in ["POST", "PUT", "PATCH", "DELETE"]:
-        csrf_field = transaction.get("csrf_field_name", "_token")
-        print(f"[Agent 3] [DEBUG] Method {method} requires CSRF. Fetching...", flush=True)
-        csrf_token, csrf_obtained = get_csrf_token(session, endpoint, csrf_field, framework)
+        if not csrf_token:
+            csrf_field = transaction.get("csrf_field_name", "_token")
+            csrf_token, csrf_obtained = get_csrf_token(session, endpoint, csrf_field, framework)
+            if csrf_token:
+                print(f"[Agent 3] │  └─ ✅ CSRF Token Acquired: {csrf_token[:15]}...", flush=True)
+                session._cached_csrf_token = csrf_token
+            else:
+                print(f"[Agent 3] │  └─ ❌ CSRF Discovery failed.", flush=True)
+        else:
+            csrf_obtained = True
+            print(f"[Agent 3] │  └─ ♻️ Using session-cached CSRF token.", flush=True)
 
         if csrf_token:
             session.headers.update({
                 "X-CSRF-Token": csrf_token,
                 "X-XSRF-Token": csrf_token,
             })
-        else:
-            print(f"[Agent 3] [DEBUG] Warning: CSRF token not found for {endpoint}", flush=True)
 
-    # Build payload
+    print(f"[Agent 3] ├─ Step 2: Preparing automated test payload...", flush=True)
     payload = generate_dummy_payload(transaction.get("fields", []))
-
-    # Add CSRF to payload if token found
     if csrf_token and transaction.get("csrf_field_name"):
         payload[transaction["csrf_field_name"]] = csrf_token
+    
+    if payload:
+        preview = str(payload)[:80] + "..." if len(str(payload)) > 80 else str(payload)
+        print(f"[Agent 3] │  └─ 📦 Payload: {preview}", flush=True)
+    else:
+        print(f"[Agent 3] │  └─ 📦 Payload: (Empty)", flush=True)
+
+    print(f"[Agent 3] ├─ Step 3: Executing live request & tracking emissions...", flush=True)
+    time.sleep(0.3) # Wait for UI readability
 
     # Track energy for this request
     tracker.start_task(transaction["id"])
     start_time = time.time()
 
     try:
-        print(f"[Agent 3] [DEBUG] Executing {method} {full_url}", flush=True)
         if method == "GET":
-            response = session.get(full_url, timeout=REQUEST_TIMEOUT)
+            response = session.get(full_url, params=payload, timeout=REQUEST_TIMEOUT)
         elif method == "POST":
-            print(f"[Agent 3] [DEBUG] Payload: {str(payload)[:100]}...", flush=True)
             response = session.post(full_url, data=payload, timeout=REQUEST_TIMEOUT)
         elif method == "PUT":
             response = session.put(full_url, data=payload, timeout=REQUEST_TIMEOUT)
@@ -253,6 +285,14 @@ def run_transaction(
 
         elapsed_ms = (time.time() - start_time) * 1000
         emissions_data = tracker.stop_task(transaction["id"])
+
+        status_icon = "✅" if response.ok else "❌"
+        print(f"[Agent 3] └─ Result: {status_icon} HTTP {response.status_code} ({elapsed_ms:.0f}ms)", flush=True)
+        
+        # Table Row logging for UI
+        energy_mwh = (emissions_data.energy_consumed * 1000) if emissions_data else 0.0
+        co2_g = (emissions_data.emissions * 1000) if emissions_data else 0.0
+        print(f"[{response.status_code}] {method} {endpoint} - {elapsed_ms:.0f}ms - {energy_mwh:.5f}mWh - {co2_g:.5f}g", flush=True)
 
         return RequestMeasurement(
             transaction_id=transaction["id"],

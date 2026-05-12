@@ -1,0 +1,9 @@
+.env
+__pycache__/
+output/
+reports/
+*.pyc
+.DS_Store
+node_modules/
+dist/
+build/

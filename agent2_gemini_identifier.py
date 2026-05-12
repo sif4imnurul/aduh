@@ -7,7 +7,7 @@ With streaming progress output (per-transaction display).
 import os
 import json
 import time
-import google.generativeai as genai
+import requests
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -15,10 +15,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+MODEL_NAME = "inclusionai/ring-2.6-1t:free"
 
-MAX_CONTENT_CHARS = 90000000
+# Context window for free models on OpenRouter is often limited.
+# We use 300k chars to ensure it fits within most free model limits.
+MAX_CONTENT_CHARS = 300_000
 
 
 @dataclass
@@ -131,36 +134,64 @@ def chunk_content(content: str, max_chars: int) -> str:
     return result[:max_chars]
 
 
-def call_gemini(content: str) -> dict:
-    key_preview = f"{GEMINI_API_KEY[:6]}..." if GEMINI_API_KEY else "None"
+def call_openrouter(content: str) -> dict:
+    key_preview = f"{OPENROUTER_API_KEY[:6]}..." if OPENROUTER_API_KEY else "None"
     print(f"[Agent 2] [DEBUG] API Key configured: {key_preview}", flush=True)
-    print(f"[Agent 2] [DEBUG] Initializing Gemini AI (Model: gemini-3.1-flash-lite)", flush=True)
-    print(f"[Agent 2] Sending {len(content)} chars to Gemini AI...", flush=True)
+    print(f"[Agent 2] [DEBUG] Initializing OpenRouter (Model: {MODEL_NAME})", flush=True)
+    print(f"[Agent 2] Sending {len(content)} chars to OpenRouter...", flush=True)
     start_time = time.time()
     
-    model = genai.GenerativeModel(
-        model_name="gemini-3.1-flash-lite",
-        system_instruction=SYSTEM_PROMPT
-    )
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://carbon-dashboard.enterprise", # Required for OpenRouter
+        "X-Title": "Enterprise Carbon Dashboard"
+    }
+    
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "user", "content": f"{SYSTEM_PROMPT}\n\nAnalyze this codebase:\n\n{content}"}
+        ],
+        "temperature": 0.1,
+    }
     
     for attempt in range(5):
         try:
             print(f"[Agent 2] [DEBUG] Generation attempt {attempt + 1}/5...", flush=True)
             
-            response = model.generate_content(
-                f"Analyze this codebase:\n\n{content}",
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.1,
-                    max_output_tokens=8192,
-                    response_mime_type="application/json"
-                )
+            response = requests.post(
+                f"{OPENROUTER_BASE_URL}/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=180
             )
             
-            raw_text = response.text.strip()
+            if response.status_code != 200:
+                print(f"[Agent 2] [DEBUG] Error {response.status_code}: {response.text}", flush=True)
+                response.raise_for_status()
+            
+            try:
+                data = response.json()
+            except Exception as json_err:
+                print(f"[Agent 2] [ERROR] Gagal memproses JSON dari OpenRouter: {str(json_err)}", flush=True)
+                print(f"[Agent 2] [DEBUG] Raw Response: {response.text[:500]}...", flush=True)
+                raise json_err
+                
+            raw_text = data["choices"][0]["message"]["content"].strip()
+            
+            # Remove markdown if present
+            if raw_text.startswith("```"):
+                lines = raw_text.split("\n")
+                if lines[0].startswith("```json"):
+                    raw_text = "\n".join(lines[1:-1])
+                else:
+                    raw_text = "\n".join(lines[1:-1])
+
             print(f"[Agent 2] [DEBUG] Raw AI response length: {len(raw_text)} chars", flush=True)
             
             elapsed = time.time() - start_time
-            print(f"[Agent 2] Gemini responded in {elapsed:.1f}s", flush=True)
+            print(f"[Agent 2] OpenRouter responded in {elapsed:.1f}s", flush=True)
             
             try:
                 parsed_json = json.loads(raw_text)
@@ -170,8 +201,12 @@ def call_gemini(content: str) -> dict:
                 print(f"[Agent 2] [ERROR] AI output is not valid JSON. Content snippet: {raw_text[:200]}...", flush=True)
                 raise je
         
+        except requests.exceptions.Timeout:
+            print(f"[Agent 2] [ERROR] Request TIMEOUT! OpenRouter took too long (>180s).", flush=True)
+            if attempt == 4: raise
+            time.sleep(10)
         except Exception as e:
-            print(f"[Agent 2] [DEBUG] Exception during AI call: {str(e)}", flush=True)
+            print(f"[Agent 2] [ERROR] Gagal memanggil OpenRouter: {str(e)}", flush=True)
             if "429" in str(e):
                 wait_time = 30 * (attempt + 1)
                 print(f"[Agent 2] [DEBUG] Rate limit hit. Waiting {wait_time}s...", flush=True)
@@ -181,7 +216,7 @@ def call_gemini(content: str) -> dict:
             else:
                 time.sleep(5)
     
-    raise RuntimeError("Gemini AI failed after 5 attempts")
+    raise RuntimeError("OpenRouter failed after 5 attempts")
 
 
 def parse_result(raw: dict, framework_hint: str = "") -> IdentificationResult:
@@ -261,7 +296,7 @@ def run(flat_file_path: str, framework_hint: str = "") -> IdentificationResult:
         print(f"[Agent 2] Preparing context (limit: {MAX_CONTENT_CHARS} chars)...", flush=True)
         content = chunk_content(content, MAX_CONTENT_CHARS)
         
-        raw = call_gemini(content)
+        raw = call_openrouter(content)
         print("[Agent 2] Parsing results...", flush=True)
         result = parse_result(raw, framework_hint)
         

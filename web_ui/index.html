@@ -271,6 +271,60 @@
       opacity: 1;
       transition: opacity 0.5s ease;
     }
+
+    /* Debug Console */
+    #debugConsole {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 400px;
+      height: 300px;
+      background: #0f172a;
+      border-top-left-radius: 0.75rem;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      border: 1px solid #334155;
+    }
+
+    #debugConsole.collapsed {
+      transform: translateY(260px);
+    }
+
+    .console-header {
+      padding: 0.75rem 1rem;
+      background: #1e293b;
+      border-top-left-radius: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border-bottom: 1px solid #334155;
+    }
+
+    .console-body {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 10px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 2px;
+    }
+
+    .log-debug { color: #94a3b8; }
+    .log-error { color: #f87171; font-weight: bold; }
+    .log-info { color: #38bdf8; }
+    .log-success { color: #4ade80; }
+    .log-warn { color: #fbbf24; }
   </style>
 </head>
 
@@ -550,6 +604,25 @@
     </div>
   </div>
 
+  <!-- Debug Console Panel -->
+  <div id="debugConsole" class="collapsed">
+    <div class="console-header" onclick="toggleConsole()">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Live Debug Console</span>
+      </div>
+      <div class="flex gap-3">
+          <button onclick="clearLogs(event)" class="text-[10px] text-slate-500 hover:text-white transition-colors">Clear</button>
+          <svg id="consoleArrow" class="w-4 h-4 text-slate-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+      </div>
+    </div>
+    <div id="consoleBody" class="console-body">
+      <div class="log-entry log-info text-slate-500 italic">Menunggu log dari agent...</div>
+    </div>
+  </div>
+
 
   <script>
     const executionPanel = document.getElementById('executionPanel');
@@ -613,6 +686,41 @@
         el.classList.replace('step-active', 'step-done');
         msgEl.innerHTML = `<span class="text-slate-800 font-semibold">Selesai</span>`;
       }
+    }
+
+    function toggleConsole() {
+        const console = document.getElementById('debugConsole');
+        const arrow = document.getElementById('consoleArrow');
+        console.classList.toggle('collapsed');
+        if (console.classList.contains('collapsed')) {
+            arrow.style.transform = 'rotate(0deg)';
+        } else {
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    function clearLogs(e) {
+        e.stopPropagation();
+        document.getElementById('consoleBody').innerHTML = '<div class="log-entry log-info text-slate-500 italic">Console cleared.</div>';
+    }
+
+    function addLog(msg) {
+        const body = document.getElementById('consoleBody');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        
+        let typeClass = 'log-debug';
+        if (msg.includes('[ERROR]') || msg.includes('Gagal') || msg.includes('400') || msg.includes('404')) typeClass = 'log-error';
+        if (msg.includes('[DEBUG]')) typeClass = 'log-debug';
+        if (msg.includes('Selesai') || msg.includes('Berhasil') || msg.includes('✅')) typeClass = 'log-success';
+        if (msg.includes('▶')) typeClass = 'log-info';
+        if (msg.includes('Warning') || msg.includes('Rate limit')) typeClass = 'log-warn';
+
+        const time = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        entry.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span><span class="${typeClass}">${msg}</span>`;
+        
+        body.appendChild(entry);
+        body.scrollTop = body.scrollHeight;
     }
 
     async function runPipeline() {
@@ -686,6 +794,7 @@
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6);
+              addLog(data);
 
               if (data === '[DONE]') {
                 await handlePipelineComplete();
@@ -712,11 +821,14 @@
                    updateStep(2, 'active', 'Mengirim konteks ke AI...');
                 }
               } else if (data.includes('Agent 3')) {
-                updateStep(2, 'done');
+                if (step2.className.includes('step-active')) updateStep(2, 'done');
                 updateStep(3, 'active', 'Menguji endpoint...');
                 document.getElementById('s3-console').classList.remove('hidden');
                 document.getElementById('s2-summary').classList.remove('hidden');
                 
+                // Show report view progressively as soon as we have transactions
+                showReportProgressively();
+
                 const runningMatch = data.match(/Running (\d+) transactions/);
                 if (runningMatch) {
                     s3TotalExpected = parseInt(runningMatch[1]);
@@ -774,6 +886,31 @@
                 continue;
               }
 
+              // Match Agent 3 Start: [AGENT3-START] METHOD | endpoint
+              const startMatch = data.match(/\[AGENT3-START\]\s+(\w+)\s+\|\s+(.*)/);
+              if (startMatch) {
+                const method = startMatch[1];
+                const path = startMatch[2];
+                const rowId = `s3-row-${btoa(path).replace(/=/g, '')}`;
+                
+                if (!document.getElementById(rowId)) {
+                    const tr = document.createElement('tr');
+                    tr.id = rowId;
+                    tr.className = "hover:bg-slate-50 transition-colors bg-blue-50/30";
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 whitespace-nowrap font-medium text-slate-700">${method}</td>
+                        <td class="px-4 py-2 truncate max-w-[150px] text-slate-500">${path}</td>
+                        <td class="px-4 py-2"><span class="text-blue-500 animate-pulse">Testing...</span></td>
+                        <td class="px-4 py-2 text-right text-slate-400">—</td>
+                        <td class="px-4 py-2 text-right text-slate-700 font-medium">—</td>
+                        <td class="px-4 py-2 text-right text-slate-700 font-medium">—</td>
+                    `;
+                    s3TableBody.appendChild(tr);
+                    s3TableContainer.scrollTop = s3TableContainer.scrollHeight;
+                }
+                continue;
+              }
+
               // Match Carbon Row: "✅ [200] GET /api/users - 120ms - 0.00012mWh - 0.0000g"
               const rowMatch = data.match(/\[(\d+)\]\s+(\w+)\s+(.*?)\s+-\s+(\d+)ms\s+-\s+([\d\.]+)mWh\s+-\s+([\d\.]+)g/);
               if (rowMatch) {
@@ -784,6 +921,15 @@
                 const energy = parseFloat(rowMatch[5]);
                 const co2 = parseFloat(rowMatch[6]);
 
+                const rowId = `s3-row-${btoa(path).replace(/=/g, '')}`;
+                let tr = document.getElementById(rowId);
+                
+                if (!tr) {
+                    tr = document.createElement('tr');
+                    tr.id = rowId;
+                    s3TableBody.appendChild(tr);
+                }
+
                 totEnergy += energy;
                 totCo2 += co2;
                 endpointsCount++;
@@ -793,8 +939,7 @@
                 document.getElementById('s3-tot-energy').innerText = totEnergy.toFixed(4);
                 document.getElementById('s3-tot-co2').innerText = totCo2.toFixed(5);
 
-                const statusHtml = `<span class="text-slate-500">[${statusVal}]</span>`;
-                const tr = document.createElement('tr');
+                const statusHtml = `<span class="text-slate-700 font-bold">[${statusVal}]</span>`;
                 tr.className = "hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
                                     <td class="px-4 py-2 whitespace-nowrap font-medium text-slate-700">${method}</td>
@@ -804,7 +949,6 @@
                                     <td class="px-4 py-2 text-right text-slate-700 font-medium">${energy.toFixed(4)}</td>
                                     <td class="px-4 py-2 text-right text-slate-700 font-medium">${co2.toFixed(5)}</td>
                                 `;
-                s3TableBody.appendChild(tr);
                 s3TableContainer.scrollTop = s3TableContainer.scrollHeight;
               }
             }
@@ -818,6 +962,26 @@
       }
     }
 
+    async function showReportProgressively() {
+        // Show the container
+        reportView.classList.remove('hidden-view');
+        reportView.classList.add('show-view');
+
+        // Fetch what we have from Agent 2 so far
+        try {
+            const res = await fetch('/api/transactions');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('rep-endpoints').innerText = data.total_routes || s2TxCount || 0;
+                document.getElementById('framework-info').textContent = `${data.framework || 'Unknown'} / ${data.language || 'Unknown'}`;
+                renderTransactions(data.transactions || [], data.framework || 'unknown');
+                document.getElementById('tx-container').style.display = 'block';
+            }
+        } catch (err) {
+            console.warn("Progressive load: Transactions not ready yet.");
+        }
+    }
+
     async function handlePipelineComplete() {
       updateStep(4, 'done');
       document.getElementById('s4-action').classList.remove('hidden');
@@ -826,26 +990,8 @@
       runBtn.disabled = false;
       runBtn.innerText = "Jalankan Ulang Audit";
 
-      // Show report view
-      setTimeout(() => {
-        reportView.classList.remove('hidden-view');
-        reportView.classList.add('show-view');
-        reportView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 500);
-
-      // Fetch dynamic transactions generated by backend
-      try {
-        const res = await fetch('/api/transactions');
-        if (res.ok) {
-          const data = await res.json();
-          document.getElementById('rep-endpoints').innerText = data.total_routes || endpointsCount || 0;
-          document.getElementById('framework-info').textContent = `${data.framework || 'Unknown'} / ${data.language || 'Unknown'}`;
-          renderTransactions(data.transactions || [], data.framework || 'unknown');
-          document.getElementById('tx-container').style.display = 'block';
-        }
-      } catch (err) {
-        console.error("Gagal memuat file transaksi:", err);
-      }
+      // Final refresh of the report
+      showReportProgressively();
     }
 
     function renderTransactions(transactions, framework) {
