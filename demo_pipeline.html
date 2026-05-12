@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green-Code Pipeline Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        /* Form Inputs */
+        .input-field {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #0f172a;
+            transition: all 0.2s;
+            background-color: #ffffff;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+        }
+
+        /* Primary Button */
+        .btn-primary {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background-color: #1e293b;
+        }
+
+        .btn-primary:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Timeline Step */
+        .step-item {
+            position: relative;
+            padding-bottom: 2rem;
+            padding-left: 2.5rem;
+        }
+
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: 0.625rem;
+            top: 1.5rem;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0;
+        }
+
+        .step-item:last-child::before {
+            display: none;
+        }
+
+        .step-icon {
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 1.375rem;
+            height: 1.375rem;
+            border-radius: 50%;
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .step-active .step-icon {
+            border-color: #0f172a;
+            background-color: #ffffff;
+        }
+
+        .step-active .step-icon::after {
+            content: '';
+            width: 0.4rem;
+            height: 0.4rem;
+            border-radius: 50%;
+            background-color: #0f172a;
+        }
+
+        .step-done .step-icon {
+            border-color: #0f172a;
+            background-color: #0f172a;
+        }
+
+        .step-done .step-icon::after {
+            content: '✓';
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .step-done::before {
+            background-color: #0f172a;
+        }
+
+        .spinner {
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #0f172a;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Report Specific Styles - Muted & Professional */
+        .report-header {
+            background: #0f172a;
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .hotspot {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .hotspot-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-HIGH {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+        }
+
+        .energy-badge {
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .issue-box {
+            background: #f8fafc;
+            border-left: 3px solid #94a3b8;
+            padding: 0.75rem 1rem;
+            border-radius: 0 0.25rem 0.25rem 0;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+        }
+
+        .code-block pre {
+            padding: 1rem;
+            overflow-x: auto;
+            color: #cbd5e1;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .code-label {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: white;
+            font-size: 0.75rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .label-orig {
+            background: #0f172a;
+        }
+
+        .label-ref {
+            background: #334155;
+        }
+
+        .hidden-view {
+            display: none !important;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .show-view {
+            display: block;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mainApp" class="flex flex-col min-h-screen">
+
+        <!-- Corporate Navbar -->
+        <header
+            class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 lg:px-10 z-10 sticky top-0">
+            <h1 class="text-slate-800 font-semibold text-lg tracking-tight">Green-Code Engine</h1>
+            <span class="text-sm font-medium text-slate-500">v1.2 Enterprise</span>
+        </header>
+
+        <!-- FULL WIDTH Main Content -->
+        <main class="w-full px-6 lg:px-10 py-6 lg:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+
+            <!-- Left Column: Configuration -->
+            <div class="lg:col-span-1">
+                <div id="configCard" class="bg-white border border-slate-200 rounded-xl p-6 flex flex-col">
+                    <h2 class="text-base font-semibold text-slate-800 mb-1">Konfigurasi Analisis</h2>
+                    <p class="text-xs text-slate-500 mb-6">Tentukan target repositori untuk audit efisiensi.</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Direktori Proyek</label>
+                            <input type="text" class="input-field" value="C:\xampp\htdocs\rekind">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">URL Endpoint Lokal</label>
+                            <input type="text" class="input-field" value="http://localhost:8000">
+                        </div>
+                    </div>
+
+                    <div class="mt-5 bg-slate-50 rounded-lg p-3.5 border border-slate-200">
+                        <h3 class="text-[11px] font-semibold text-slate-800 mb-2 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Panduan Pemakaian
+                        </h3>
+                        <ul class="text-[10px] text-slate-600 space-y-1.5 leading-relaxed pl-0.5">
+                            <li class="flex gap-1.5 items-start"><span class="text-slate-400 mt-0.5">•</span>
+                                <span>Pastikan aplikasi sudah <strong>dijalankan secara lokal</strong> (running) pada
+                                    URL target di atas.</span></li>
+                            <li class="flex gap-1.5 items-start"><span class="text-slate-400 mt-0.5">•</span>
+                                <span>Untuk <strong>Link Repositori Git</strong>, sistem akan mengunduh kode sementara,
+                                    namun pastikan URL lokalnya tetap disiapkan dan aktif.</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-4 mt-auto">
+                        <button id="runBtn" onclick="runPipeline()" class="btn-primary w-full">
+                            Mulai
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pipeline Execution -->
+            <div class="lg:col-span-3">
+                <div id="executionPanel"
+                    class="bg-white border border-slate-200 rounded-xl p-6 opacity-50 pointer-events-none transition-opacity duration-300 flex flex-col">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                        <h2 class="text-base font-semibold text-slate-800">Log Eksekusi</h2>
+                        <span id="pipelineStatus"
+                            class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium border border-slate-200">Siap</span>
+                    </div>
+
+                    <!-- Clean Timeline -->
+                    <div class="pl-2 w-full">
+                        <!-- Agent 1 -->
+                        <div id="step1" class="step-item">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">1. Pemindaian Repositori</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menganalisis arsitektur dan
+                                        memetakan
+                                        seluruh basis kode proyek Anda.</p>
+                                </div>
+                                <span id="s1-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Memindai...</span>
+                            </div>
+                        </div>
+
+                        <!-- Agent 2 -->
+                        <div id="step2" class="step-item">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">2. Analisis Kecerdasan Buatan
+                                        (AI)
+                                    </h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menggunakan kecerdasan buatan
+                                        untuk
+                                        mendeteksi celah dan titik rawan efisiensi.</p>
+                                </div>
+                                <span id="s2-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Menganalisis...</span>
+                            </div>
+                        </div>
+
+                        <!-- Agent 3 -->
+                        <div id="step3" class="step-item">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">3. Uji Beban Emisi Karbon</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Melakukan stress-test pada
+                                        API untuk
+                                        mengkalkulasi pemakaian energi & jejak karbon aktual.</p>
+                                </div>
+                                <span id="s3-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Menguji (0/32)...</span>
+                            </div>
+
+                            <!-- Table output for Agent 3 -->
+                            <div id="s3-console"
+                                class="mt-3 border border-slate-200 rounded-md overflow-hidden hidden w-full mr-4">
+                                <div class="h-48 overflow-y-auto bg-white" id="s3-table-container">
+                                    <table class="w-full text-left text-xs text-slate-600">
+                                        <thead
+                                            class="text-[11px] text-slate-500 uppercase bg-slate-50 sticky top-0 border-b border-slate-200 z-10">
+                                            <tr>
+                                                <th scope="col" class="px-4 py-2 font-semibold">Metode</th>
+                                                <th scope="col" class="px-4 py-2 font-semibold">Endpoint</th>
+                                                <th scope="col" class="px-4 py-2 font-semibold">Status</th>
+                                                <th scope="col" class="px-4 py-2 font-semibold text-right">Waktu</th>
+                                                <th scope="col" class="px-4 py-2 font-semibold text-right">Energi (mWh)
+                                                </th>
+                                                <th scope="col" class="px-4 py-2 font-semibold text-right">CO₂ (g)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="s3-table-body"
+                                            class="divide-y divide-slate-100 font-mono text-[11px]">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="s3-summary"
+                                    class="bg-slate-50 px-4 py-2.5 border-t border-slate-200 flex justify-between items-center text-xs font-semibold text-slate-700 hidden">
+                                    <span>Total Jejak Karbon</span>
+                                    <div class="flex gap-5 text-slate-700">
+                                        <span>Energi: <span id="s3-tot-energy" class="font-bold">0.00</span> mWh</span>
+                                        <span>CO₂: <span id="s3-tot-co2" class="font-bold">0.00</span> g</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 4 -->
+                        <div id="step4" class="step-item pb-0">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">4. Penyusunan Laporan Akhir</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menyusun hasil akhir dan
+                                        merumuskan
+                                        rekomendasi optimasi kode tingkat lanjut.</p>
+                                </div>
+                                <span id="s4-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Menyusun...</span>
+                            </div>
+
+                            <!-- Success Action -->
+                            <div id="s4-action" class="mt-4 hidden w-full pr-4">
+                                <div
+                                    class="p-4 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-800">Analisis Selesai Berhasil!</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Laporan diagnostik efisiensi karbon
+                                            telah berhasil disusun dan tersedia di bawah.</p>
+                                    </div>
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- FULL WIDTH Report View (Appears automatically below) -->
+        <div id="reportView" class="hidden-view w-full px-6 lg:px-10 pb-12 mt-4">
+
+            <div class="report-header">
+                <h1 class="text-2xl font-bold mb-1 tracking-tight">Laporan Diagnostik Optimasi Kode</h1>
+                <div class="opacity-70 text-sm font-mono">ID: REF-882-SYS</div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="number">8</div>
+                    <div class="text-[10px] text-slate-500 font-semibold mt-1 uppercase tracking-wider">Titik Diperiksa
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">7</div>
+                    <div class="text-[10px] text-slate-500 font-semibold mt-1 uppercase tracking-wider">Berhasil
+                        Dioptimasi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number text-slate-800">4</div>
+                    <div class="text-[10px] text-slate-500 font-semibold mt-1 uppercase tracking-wider">Prioritas Tinggi
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="number text-slate-500">4</div>
+                    <div class="text-[10px] text-slate-500 font-semibold mt-1 uppercase tracking-wider">Prioritas
+                        Menengah</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 1 -->
+            <div class="hotspot">
+                <div class="hotspot-header">
+                    <span class="severity-badge severity-HIGH">P-1</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 font-mono">GET /grid-agenda</h3>
+                        <div class="text-xs text-slate-500 mt-0.5">AgendaController@grid</div>
+                    </div>
+                    <div class="energy-badge">45.27 mWh</div>
+                </div>
+
+                <div class="issue-box">
+                    <strong>Diagnosis:</strong> Terdeteksi pengambilan data tanpa paginasi. Pemakaian memori sangat
+                    tinggi dan eksekusi query lambat akibat <code>-&gt;get()</code>. Proses loop berlanjut menghasilkan
+                    kompleksitas berat O(N*M).
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 my-4">
+                    <div class="code-block">
+                        <div class="code-label label-orig">Kode Asli</div>
+                        <pre>public function grid(Request $request)
+{
+    $month = $request-&gt;input('month', Carbon::now()-&gt;month);
+    $year = $request-&gt;input('year', Carbon::now()-&gt;year);
+    
+    // Inefficient read
+    $agendas = Agenda::whereMonth('tanggal_mulai', $month)
+                    -&gt;whereYear('tanggal_mulai', $year)
+                    -&gt;orWhere(function($query) use ($month, $year) {
+                        $query-&gt;whereMonth('tanggal_deadline', $month)
+                              -&gt;whereYear('tanggal_deadline', $year);
+                    })-&gt;get();
+    
+    $calendar = $this-&gt;generateCalendar($month, $year, $agendas);
+    return view('pages.reference.agenda.grid', compact('calendar', 'agendas'));
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label label-ref">Saran Optimasi</div>
+                        <pre>public function grid(Request $request)
+{
+    $month = $request-&gt;input('month', Carbon::now()-&gt;month);
+    $year = $request-&gt;input('year', Carbon::now()-&gt;year);
+    
+    $startOfMonth = Carbon::create($year, $month, 1)-&gt;startOfDay();
+    $endOfMonth = Carbon::create($year, $month, 1)-&gt;endOfMonth()-&gt;endOfDay();
+
+    // Range bounded query
+    $agendas = Agenda::where(function($query) use ($startOfMonth, $endOfMonth) {
+                        $query-&gt;where('tanggal_mulai', '&lt;=', $endOfMonth)
+                              -&gt;where('tanggal_deadline', '&gt;=', $startOfMonth);
+                    })-&gt;get();
+
+    $agendasGroupedByDay = collect();
+    foreach ($agendas as $agenda) {
+        // O(1) structure logic
+    }
+    
+    $calendar = $this-&gt;generateCalendar($month, $year, $agendasGroupedByDay);
+    return view('pages.reference.agenda.grid', compact('calendar', 'agendas'));
+}</pre>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded border border-slate-200 mt-4 text-sm text-slate-700">
+                    <div class="grid grid-cols-1 gap-2 mb-4">
+                        <div><strong>Perubahan Logika:</strong> Parameter query dibatasi dan menggunakan penyusunan data
+                            tingkat lanjut untuk akses kecepatan O(1).</div>
+                        <div><strong>Dampak (Delta):</strong> Penurunan drastis pemakaian siklus CPU dengan mencegah
+                            loop berulang pada perenderan tampilan.</div>
+                    </div>
+
+                    <div class="border-t border-slate-200 pt-3 mt-2">
+                        <strong class="block mb-2 text-slate-800">Penjelasan Teknis:</strong>
+                        <ol class="list-decimal pl-5 space-y-1 text-slate-600">
+                            <li>Mengganti pencocokan tanggal luas dengan perbandingan timestamp yang ketat.</li>
+                            <li>Mengaplikasikan memori kelompok (*memory grouping*) untuk mencegah loop berlebih saat
+                                kalender dimuat.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hotspot 2 -->
+            <div class="hotspot">
+                <div class="hotspot-header">
+                    <span class="severity-badge severity-HIGH">P-1</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 font-mono">GET /logo</h3>
+                        <div class="text-xs text-slate-500 mt-0.5">LogoController@index</div>
+                    </div>
+                    <div class="energy-badge">42.22 mWh</div>
+                </div>
+
+                <div class="issue-box">
+                    <strong>Diagnosis:</strong> Tarikan database langsung secara keseluruhan tanpa adanya batasan
+                    (*offset mapping*), mengakibatkan RAM membengkak.
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 my-4">
+                    <div class="code-block">
+                        <div class="code-label label-orig">Kode Asli</div>
+                        <pre>public function index()
+{
+    $logos = ProdukModel::where('kategori', 'logo')-&gt;get();
+    return view('pages.picture.logo.index', compact('logos'));
+}</pre>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-label label-ref">Saran Optimasi</div>
+                        <pre>public function index()
+{
+    // Limit application
+    $logos = ProdukModel::where('kategori', 'logo')-&gt;paginate(15);
+    return view('pages.picture.logo.index', compact('logos'));
+}</pre>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded border border-slate-200 mt-4 text-sm text-slate-700">
+                    <div class="grid grid-cols-1 gap-2 mb-4">
+                        <div><strong>Perubahan Logika:</strong> Implementasi batas paginasi otomatis.</div>
+                        <div><strong>Dampak (Delta):</strong> Konsumsi memori menjadi jauh lebih ringan dan stabil pada
+                            bobot *payload* tetap.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="text-center text-[10px] text-slate-400 mt-4 pb-8 border-t border-slate-200 pt-6 uppercase tracking-widest font-semibold">
+                Akhir Laporan
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        const executionPanel = document.getElementById('executionPanel');
+        const pipelineStatus = document.getElementById('pipelineStatus');
+        const runBtn = document.getElementById('runBtn');
+        const reportView = document.getElementById('reportView');
+
+        // Lock the left card's height to the right card's initial height
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const configCard = document.getElementById('configCard');
+                const execPanel = document.getElementById('executionPanel');
+                if (configCard && execPanel) {
+                    // Reset heights to auto just in case
+                    configCard.style.height = 'auto';
+                    execPanel.style.minHeight = 'auto';
+
+                    const maxHeight = Math.max(configCard.offsetHeight, execPanel.offsetHeight);
+
+                    configCard.style.height = maxHeight + 'px';
+                    execPanel.style.minHeight = maxHeight + 'px';
+                }
+            }, 100);
+        });
+
+        async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        function updateStep(stepId, state, msgText) {
+            const el = document.getElementById(`step${stepId}`);
+            const msgEl = document.getElementById(`s${stepId}-msg`);
+
+            if (state === 'active') {
+                el.classList.add('step-active');
+                msgEl.classList.remove('hidden');
+                if (msgText) msgEl.innerHTML = `<span class="spinner"></span> ${msgText}`;
+            } else if (state === 'done') {
+                el.classList.replace('step-active', 'step-done');
+                msgEl.innerHTML = `<span class="text-slate-800 font-semibold">Selesai</span>`;
+            }
+        }
+
+        async function runPipeline() {
+            runBtn.disabled = true;
+            runBtn.innerText = "Sistem Sedang Berjalan...";
+
+            executionPanel.classList.remove('opacity-50', 'pointer-events-none');
+            pipelineStatus.className = 'px-2.5 py-1 bg-slate-800 text-white rounded text-xs font-semibold';
+            pipelineStatus.innerText = 'Aktif';
+            reportView.classList.remove('show-view');
+            reportView.classList.add('hidden-view');
+
+            // Reset
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).className = 'step-item' + (i === 4 ? ' pb-0' : '');
+                document.getElementById(`s${i}-msg`).classList.add('hidden');
+            }
+            document.getElementById('s4-action').classList.add('hidden');
+            const consoleEl = document.getElementById('s3-console');
+            consoleEl.classList.add('hidden');
+            // Do not clear innerHTML here because it will destroy the table layout
+
+            // Step 1
+            updateStep(1, 'active', 'Memindai kerangka proyek...');
+            await wait(2800);
+            updateStep(1, 'done');
+
+            // Step 2
+            updateStep(2, 'active', 'Mengirim konteks ke AI...');
+            await wait(3500);
+            updateStep(2, 'done');
+
+            // Step 3
+            const staticEndpoints = [
+                { method: 'GET', path: '/api/users', ms: 120, status: 200 },
+                { method: 'POST', path: '/api/auth/login', ms: 340, status: 200 },
+                { method: 'GET', path: '/api/dashboard', ms: 85, status: 200 },
+                { method: 'GET', path: '/api/settings', ms: 45, status: 200 },
+                { method: 'POST', path: '/api/report', ms: 890, status: 201 },
+                { method: 'GET', path: '/api/agenda/grid', ms: 452, status: 200 },
+                { method: 'PUT', path: '/api/users/12', ms: 140, status: 200 },
+                { method: 'DELETE', path: '/api/agenda/5', ms: 60, status: 401 },
+                { method: 'GET', path: '/api/logo', ms: 422, status: 200 },
+                { method: 'GET', path: '/api/twibbon', ms: 721, status: 200 },
+                { method: 'GET', path: '/api/crm/permohonan', ms: 421, status: 200 },
+                { method: 'GET', path: '/api/buku/grid', ms: 443, status: 200 },
+                { method: 'GET', path: '/api/media-monitoring', ms: 627, status: 200 },
+                { method: 'GET', path: '/api/search-buletin', ms: 448, status: 200 },
+                { method: 'POST', path: '/api/users/upload', ms: 1250, status: 201 },
+                { method: 'GET', path: '/api/auth/me', ms: 32, status: 200 },
+                { method: 'PUT', path: '/api/settings/profile', ms: 110, status: 200 },
+                { method: 'GET', path: '/api/notifications', ms: 55, status: 200 },
+                { method: 'POST', path: '/api/agenda', ms: 210, status: 201 },
+                { method: 'DELETE', path: '/api/logo/3', ms: 45, status: 401 },
+                { method: 'GET', path: '/api/crm/data-client', ms: 385, status: 200 },
+                { method: 'PUT', path: '/api/buku/9', ms: 145, status: 200 },
+                { method: 'GET', path: '/api/twibbon/search', ms: 180, status: 200 },
+                { method: 'POST', path: '/api/crm/follow-up', ms: 230, status: 201 },
+                { method: 'GET', path: '/api/report/export', ms: 1150, status: 200 },
+                { method: 'GET', path: '/api/users/list', ms: 90, status: 200 },
+                { method: 'POST', path: '/api/media-monitoring/sync', ms: 840, status: 200 },
+                { method: 'PUT', path: '/api/agenda/publish', ms: 135, status: 200 },
+                { method: 'GET', path: '/api/dashboard/stats', ms: 215, status: 200 },
+                { method: 'DELETE', path: '/api/buku/1', ms: 75, status: 401 },
+                { method: 'GET', path: '/api/system/health', ms: 15, status: 200 },
+                { method: 'POST', path: '/api/auth/logout', ms: 40, status: 200 }
+            ];
+
+            const totalEndpoints = staticEndpoints.length;
+            updateStep(3, 'active', `Menguji (${0}/${totalEndpoints})...`);
+            consoleEl.classList.remove('hidden');
+
+            let totEnergy = 0;
+            let totCo2 = 0;
+            const tableBody = document.getElementById('s3-table-body');
+            const tableContainer = document.getElementById('s3-table-container');
+            tableBody.innerHTML = ''; // reset
+
+            for (let i = 0; i < totalEndpoints; i++) {
+                const ep = staticEndpoints[i];
+                document.getElementById(`s3-msg`).innerHTML = `<span class="spinner"></span> Menguji (${i + 1}/${totalEndpoints})...`;
+
+                const ms = ep.ms;
+                const energy = ms * 0.0001;
+                const co2 = ms * 0.00003;
+
+                totEnergy += energy;
+                totCo2 += co2;
+
+                const statusVal = ep.status;
+                const statusHtml = `<span class="text-slate-500">[${statusVal}]</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap font-medium text-slate-700">${ep.method}</td>
+                    <td class="px-4 py-2 truncate max-w-[150px] text-slate-500">${ep.path}</td>
+                    <td class="px-4 py-2">${statusHtml}</td>
+                    <td class="px-4 py-2 text-right text-slate-400">${ms}ms</td>
+                    <td class="px-4 py-2 text-right text-slate-700 font-medium">${energy.toFixed(4)}</td>
+                    <td class="px-4 py-2 text-right text-slate-700 font-medium">${co2.toFixed(5)}</td>
+                `;
+
+                tableBody.appendChild(tr);
+                tableContainer.scrollTop = tableContainer.scrollHeight;
+
+                await wait(2000); // 2 seconds per row as requested
+            }
+
+            document.getElementById('s3-tot-energy').innerText = totEnergy.toFixed(2);
+            document.getElementById('s3-tot-co2').innerText = totCo2.toFixed(3);
+            document.getElementById('s3-summary').classList.remove('hidden');
+
+            updateStep(3, 'done');
+
+            // Step 4
+            updateStep(4, 'active', 'Menyusun laporan akhir...');
+            await wait(3500);
+            updateStep(4, 'done');
+
+            // Finish
+            document.getElementById('s4-action').classList.remove('hidden');
+            pipelineStatus.className = 'px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-600 rounded text-xs font-medium';
+            pipelineStatus.innerText = 'Selesai';
+
+            runBtn.disabled = false;
+            runBtn.innerText = "Jalankan Ulang Audit";
+
+            // Automatically reveal report smoothly
+            await wait(500);
+            reportView.classList.remove('hidden-view');
+            reportView.classList.add('show-view');
+
+            // Scroll down to the report view
+            setTimeout(() => {
+                reportView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>

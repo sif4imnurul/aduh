@@ -1,0 +1,82 @@
+{
+  "success": true,
+  "framework": "Flask",
+  "language": "Python",
+  "transactions": [
+    {
+      "id": "txn_001",
+      "method": "GET",
+      "endpoint": "/",
+      "description": "Serves the main web UI dashboard.",
+      "requires_auth": false,
+      "requires_csrf": false,
+      "csrf_field_name": "",
+      "fields": [],
+      "framework": "Flask",
+      "tags": [
+        "ui",
+        "static"
+      ]
+    },
+    {
+      "id": "txn_002",
+      "method": "GET",
+      "endpoint": "/api/transactions",
+      "description": "Retrieves the generated transactions.json file, containing identified routes and their details from a previous pipeline run.",
+      "requires_auth": false,
+      "requires_csrf": false,
+      "csrf_field_name": "",
+      "fields": [],
+      "framework": "Flask",
+      "tags": [
+        "api",
+        "report"
+      ]
+    },
+    {
+      "id": "txn_003",
+      "method": "POST",
+      "endpoint": "/api/run-pipeline",
+      "description": "Triggers the multi-agent code carbon analysis pipeline and streams execution logs via Server-Sent Events (SSE).",
+      "requires_auth": false,
+      "requires_csrf": false,
+      "csrf_field_name": "",
+      "fields": [
+        {
+          "name": "source",
+          "type": "string",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required"
+          ]
+        },
+        {
+          "name": "base_url",
+          "type": "string",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "skip_carbon",
+          "type": "boolean",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "Flask",
+      "tags": [
+        "api",
+        "pipeline",
+        "admin"
+      ]
+    }
+  ],
+  "total_routes": 3,
+  "post_routes": 1,
+  "csrf_protected_routes": 0,
+  "auth_required_routes": 0,
+  "error": null
+}

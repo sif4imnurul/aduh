@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "flat_file_path": "output\\flat_codebase.txt",
+  "source_type": "local",
+  "source_path": "D:\\technofest",
+  "file_size_bytes": 1585292,
+  "detected_language": "Python",
+  "detected_framework": "fastapi",
+  "error": null
+}
