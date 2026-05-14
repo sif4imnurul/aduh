@@ -34,6 +34,14 @@ class TransactionField:
 
 
 @dataclass
+class Inefficiency:
+    file: str
+    lines: str
+    reason: str
+    impact: str
+    suggestion: str
+
+@dataclass
 class Transaction:
     id: str
     method: str
@@ -53,10 +61,11 @@ class IdentificationResult:
     framework: str
     language: str
     transactions: list[Transaction]
-    total_routes: int
-    post_routes: int
-    csrf_protected_routes: int
-    auth_required_routes: int
+    inefficiencies: list[Inefficiency] = field(default_factory=list)
+    total_routes: int = 0
+    post_routes: int = 0
+    csrf_protected_routes: int = 0
+    auth_required_routes: int = 0
     error: Optional[str] = None
 
 
@@ -91,8 +100,16 @@ Be exhaustive. Scan all controller files and route definitions.
       "csrf_field_name": "_token",
       "fields": [
         {"name": "email", "type": "email", "required": true, "validation_rules": ["required", "email"]}
-      ],
-      "tags": ["auth"]
+      ]
+    }
+  ],
+  "inefficiencies": [
+    {
+      "file": "app/Http/Controllers/UserController.php",
+      "lines": "45-60",
+      "reason": "N+1 Query in user list",
+      "impact": "High Database Load / Energy Waste",
+      "suggestion": "Use Eager Loading with User::with('profile')->get()"
     }
   ]
 }
@@ -221,7 +238,6 @@ def call_openrouter(content: str) -> dict:
 
 def parse_result(raw: dict, framework_hint: str = "") -> IdentificationResult:
     transactions = []
-    
     for t in raw.get("transactions", []):
         fields = [
             TransactionField(
@@ -233,7 +249,6 @@ def parse_result(raw: dict, framework_hint: str = "") -> IdentificationResult:
             )
             for f in t.get("fields", [])
         ]
-        
         transactions.append(Transaction(
             id=t.get("id", f"txn_{len(transactions):03d}"),
             method=t["method"].upper(),
@@ -247,12 +262,17 @@ def parse_result(raw: dict, framework_hint: str = "") -> IdentificationResult:
             tags=t.get("tags", []),
         ))
     
+    inefficiencies = [
+        Inefficiency(**i) for i in raw.get("inefficiencies", [])
+    ]
+    
     mutating = {"POST", "PUT", "PATCH", "DELETE"}
     return IdentificationResult(
         success=True,
         framework=raw.get("framework", framework_hint),
         language=raw.get("language", "Unknown"),
         transactions=transactions,
+        inefficiencies=inefficiencies,
         total_routes=len(transactions),
         post_routes=sum(1 for t in transactions if t.method in mutating),
         csrf_protected_routes=sum(1 for t in transactions if t.requires_csrf),

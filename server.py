@@ -71,4 +71,6 @@ def run_pipeline():
 
 if __name__ == '__main__':
     print("Starting Code Carbon Server at http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Disable use_reloader because the agents write files to the workspace, 
+    # which triggers a restart and interrupts the pipeline.
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)

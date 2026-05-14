@@ -376,6 +376,10 @@
                                     class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
                                         class="spinner"></span> Menganalisis...</span>
                             </div>
+                            <!-- Activity Log for Agent 2 -->
+                            <div id="s2-console" class="mt-3 bg-slate-50 border border-slate-200 rounded-md p-3 hidden font-mono text-[11px] text-slate-600 max-h-32 overflow-y-auto">
+                                <div id="s2-log-content"></div>
+                            </div>
                         </div>
 
                         <!-- Agent 3 -->
@@ -427,30 +431,65 @@
                         </div>
 
                         <!-- Agent 4 -->
-                        <div id="step4" class="step-item pb-0">
+                        <div id="step4" class="step-item">
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">4. Penyusunan Laporan Akhir</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menyusun hasil akhir dan
-                                        merumuskan
-                                        rekomendasi optimasi kode tingkat lanjut.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">4. AI Code Refactoring</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Melakukan optimasi kode otomatis pada bagian yang terdeteksi tidak efisien.</p>
                                 </div>
                                 <span id="s4-msg"
                                     class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Merefaktor...</span>
+                            </div>
+                            <!-- Activity Log for Agent 4 -->
+                            <div id="s4-console" class="mt-3 bg-slate-900 border border-slate-700 rounded-md p-3 hidden font-mono text-[11px] text-blue-300 max-h-32 overflow-y-auto">
+                                <div id="s4-log-content"></div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 5 -->
+                        <div id="step5" class="step-item">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">5. Optimization Validator</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Memvalidasi hasil refactor untuk memastikan integritas sistem tetap terjaga.</p>
+                                </div>
+                                <span id="s5-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
+                                        class="spinner"></span> Memvalidasi...</span>
+                            </div>
+                            <!-- Activity Log for Agent 5 -->
+                            <div id="s5-console" class="mt-3 bg-slate-50 border border-slate-200 rounded-md p-3 hidden font-mono text-[11px] text-slate-600">
+                                <div id="s5-log-content"></div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 6 -->
+                        <div id="step6" class="step-item pb-0">
+                            <div class="step-icon"></div>
+                            <div class="flex items-start justify-between w-full">
+                                <div>
+                                    <h4 class="text-base font-semibold text-slate-800">6. Penyusunan Laporan Akhir</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menyusun hasil akhir, riwayat refactor, dan rekomendasi optimasi.</p>
+                                </div>
+                                <span id="s6-msg"
+                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
                                         class="spinner"></span> Menyusun...</span>
                             </div>
+                        </div>
 
                             <!-- Success Action -->
-                            <div id="s4-action" class="mt-4 hidden w-full pr-4">
+                            <div id="s6-action" class="mt-4 hidden w-full pr-4">
                                 <div
                                     class="p-4 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
                                     <div>
-                                        <p class="text-sm font-semibold text-slate-800">Analisis Selesai Berhasil!</p>
-                                        <p class="text-xs text-slate-500 mt-0.5">Laporan diagnostik efisiensi karbon
-                                            telah berhasil disusun dan tersedia di bawah.</p>
+                                        <p class="text-sm font-semibold text-slate-800">Analisis & Optimasi Selesai!</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Laporan diagnostik, hasil refactor, dan status validasi
+                                            telah berhasil disusun.</p>
                                     </div>
-                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
@@ -682,11 +721,15 @@
             reportView.classList.add('hidden-view');
 
             // Reset
-            for (let i = 1; i <= 4; i++) {
-                document.getElementById(`step${i}`).className = 'step-item' + (i === 4 ? ' pb-0' : '');
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`step${i}`).className = 'step-item' + (i === 6 ? ' pb-0' : '');
                 document.getElementById(`s${i}-msg`).classList.add('hidden');
+                const console = document.getElementById(`s${i}-console`);
+                if (console) console.classList.add('hidden');
+                const log = document.getElementById(`s${i}-log-content`);
+                if (log) log.innerHTML = '';
             }
-            document.getElementById('s4-action').classList.add('hidden');
+            document.getElementById('s6-action').classList.add('hidden');
             const consoleEl = document.getElementById('s3-console');
             consoleEl.classList.add('hidden');
             // Do not clear innerHTML here because it will destroy the table layout
@@ -696,9 +739,25 @@
             await wait(2800);
             updateStep(1, 'done');
 
-            // Step 2
+            // Step 2: AI Analysis
             updateStep(2, 'active', 'Mengirim konteks ke AI...');
-            await wait(3500);
+            const s2Console = document.getElementById('s2-console');
+            const s2Log = document.getElementById('s2-log-content');
+            s2Console.classList.remove('hidden');
+            
+            const discoveryLogs = [
+                "Found Route: GET /login", "Found Route: POST /login",
+                "Found Route: GET /home", "Found Route: GET /grid-agenda",
+                "Analysing UserController.php...", "Inefficiency detected in UserController.php:L45",
+                "Found Route: GET /logo", "Analysing AgendaController.php...",
+                "Inefficiency detected in AgendaController.php:L102"
+            ];
+
+            for (const log of discoveryLogs) {
+                s2Log.innerHTML += `<div class="py-0.5"><span class="text-slate-400">>></span> ${log}</div>`;
+                s2Console.scrollTop = s2Console.scrollHeight;
+                await wait(600);
+            }
             updateStep(2, 'done');
 
             // Step 3
@@ -784,13 +843,53 @@
 
             updateStep(3, 'done');
 
-            // Step 4
-            updateStep(4, 'active', 'Menyusun laporan akhir...');
-            await wait(3500);
+            // Step 4: Refactor
+            updateStep(4, 'active', 'Menganalisis pola inefisiensi...');
+            const s4Console = document.getElementById('s4-console');
+            const s4Log = document.getElementById('s4-log-content');
+            s4Console.classList.remove('hidden');
+
+            const refactorTasks = [
+                "Applying Eager Loading in UserController.php...",
+                "Optimizing Date Range Query in AgendaController.php...",
+                "Implementing Pagination in LogoController.php...",
+                "Refactor complete for 3 locations."
+            ];
+
+            for (const task of refactorTasks) {
+                s4Log.innerHTML += `<div class="py-0.5"><span class="text-blue-500">$</span> ${task}</div>`;
+                s4Console.scrollTop = s4Console.scrollHeight;
+                await wait(1200);
+            }
             updateStep(4, 'done');
 
+            // Step 5: Validator
+            updateStep(5, 'active', 'Menjalankan unit test & validasi...');
+            const s5Console = document.getElementById('s5-console');
+            const s5Log = document.getElementById('s5-log-content');
+            s5Console.classList.remove('hidden');
+
+            const validationSteps = [
+                "Running Syntax Check... ✅",
+                "Validating UserControllerRefactor... ✅",
+                "Testing Agenda Range Logic... ✅",
+                "Checking for Side Effects... ✅",
+                "Security Check (CSRF Integrity)... ✅"
+            ];
+
+            for (const step of validationSteps) {
+                s5Log.innerHTML += `<div class="py-0.5 border-b border-slate-100 last:border-0">${step}</div>`;
+                await wait(800);
+            }
+            updateStep(5, 'done');
+
+            // Step 6: Report
+            updateStep(6, 'active', 'Menyusun laporan akhir...');
+            await wait(3500);
+            updateStep(6, 'done');
+
             // Finish
-            document.getElementById('s4-action').classList.remove('hidden');
+            document.getElementById('s6-action').classList.remove('hidden');
             pipelineStatus.className = 'px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-600 rounded text-xs font-medium';
             pipelineStatus.innerText = 'Selesai';
 

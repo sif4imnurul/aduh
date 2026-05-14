@@ -19,7 +19,9 @@ if sys.platform == "win32":
 import agent1_ingestion
 import agent2_gemini_identifier
 import agent3_carbon
-import agent4_report
+import agent4_refactor
+import agent5_validator
+import agent6_report
 
 
 def main():
@@ -98,8 +100,16 @@ Examples:
             print(f"[PIPELINE] ⚠️  Agent 3 warning: {carbon.error}")
 
     # ── Agent 4 ───────────────────────────────────────────────
-    print("\n[PIPELINE] ▶ Agent 4 — Refactor Report")
-    report_path = agent4_report.run(args.output)
+    print("\n[PIPELINE] ▶ Agent 4 — AI Code Refactor")
+    agent4_refactor.run(args.output)
+
+    # ── Agent 5 ───────────────────────────────────────────────
+    print("\n[PIPELINE] ▶ Agent 5 — Optimization Validator")
+    agent5_validator.run(args.output)
+
+    # ── Agent 6 ───────────────────────────────────────────────
+    print("\n[PIPELINE] ▶ Agent 6 — Comprehensive Report")
+    report_path = agent6_report.run(args.output)
 
     print("\n" + "=" * 60)
     print("✅ PIPELINE COMPLETE")

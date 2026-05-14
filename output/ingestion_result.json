@@ -2,8 +2,8 @@
   "success": true,
   "flat_file_path": "output\\flat_codebase.txt",
   "source_type": "local",
-  "source_path": "C:\\xampp\\htdocs\\bmkg\\web-bmkg-data-request",
-  "file_size_bytes": 2457311,
+  "source_path": "C:\\xampp\\htdocs\\rekind",
+  "file_size_bytes": 1323014,
   "detected_language": "PHP",
   "detected_framework": "laravel",
   "error": null

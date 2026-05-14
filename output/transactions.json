@@ -6,6 +6,34 @@
     {
       "id": "txn_001",
       "method": "GET",
+      "endpoint": "/",
+      "description": "Landing page - displays welcome/home page",
+      "requires_auth": false,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "txn_002",
+      "method": "GET",
+      "endpoint": "/home",
+      "description": "Home page after login - main dashboard view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "txn_003",
+      "method": "GET",
       "endpoint": "/login",
       "description": "Display login form",
       "requires_auth": false,
@@ -18,29 +46,17 @@
       ]
     },
     {
-      "id": "txn_002",
+      "id": "txn_004",
       "method": "POST",
       "endpoint": "/login",
-      "description": "Authenticate user credentials",
+      "description": "Authenticate user with nama and NPK",
       "requires_auth": false,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email",
-            "max:255"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
+          "name": "nama",
+          "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
@@ -49,43 +65,16 @@
           ]
         },
         {
-          "name": "remember",
-          "type": "checkbox",
-          "required": false,
+          "name": "npk",
+          "type": "password",
+          "required": true,
           "description": "",
           "validation_rules": [
-            "boolean"
+            "required",
+            "string"
           ]
         }
       ],
-      "framework": "laravel",
-      "tags": [
-        "auth"
-      ]
-    },
-    {
-      "id": "txn_003",
-      "method": "POST",
-      "endpoint": "/logout",
-      "description": "Destroy authenticated session",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth"
-      ]
-    },
-    {
-      "id": "txn_004",
-      "method": "GET",
-      "endpoint": "/register",
-      "description": "Display registration form",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
       "framework": "laravel",
       "tags": [
         "auth"
@@ -94,90 +83,12 @@
     {
       "id": "txn_005",
       "method": "POST",
-      "endpoint": "/register",
-      "description": "Register new user account",
-      "requires_auth": false,
+      "endpoint": "/logout",
+      "description": "Logout user and invalidate session",
+      "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "name",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:255"
-          ]
-        },
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "lowercase",
-            "email",
-            "max:255",
-            "unique:users,email"
-          ]
-        },
-        {
-          "name": "phone",
-          "type": "tel",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "phone_country",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "company_name",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "confirmed",
-            "min:8"
-          ]
-        },
-        {
-          "name": "password_confirmation",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
+      "fields": [],
       "framework": "laravel",
       "tags": [
         "auth"
@@ -186,472 +97,151 @@
     {
       "id": "txn_006",
       "method": "GET",
-      "endpoint": "/verify-email",
-      "description": "Prompt user to verify email address",
+      "endpoint": "/profile",
+      "description": "Display user profile edit page",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "auth",
-        "email-verification"
+        "profile"
       ]
     },
     {
       "id": "txn_007",
-      "method": "GET",
-      "endpoint": "/verify-email/{id}/{hash}",
-      "description": "Mark user email as verified",
+      "method": "PUT",
+      "endpoint": "/profile",
+      "description": "Update user profile information and optionally change password",
       "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "email",
+            "unique:user,email"
+          ]
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "npk",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "tel",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "alamat",
+          "type": "textarea",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string"
+          ]
+        },
+        {
+          "name": "tanggal_lahir",
+          "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date"
+          ]
+        },
+        {
+          "name": "current_password",
+          "type": "password",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "required_with:new_password"
+          ]
+        },
+        {
+          "name": "new_password",
+          "type": "password",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "min:8",
+            "confirmed"
+          ]
+        },
+        {
+          "name": "image",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        }
+      ],
       "framework": "laravel",
       "tags": [
-        "auth",
-        "email-verification"
+        "profile"
       ]
     },
     {
       "id": "txn_008",
-      "method": "POST",
-      "endpoint": "/email/verification-notification",
-      "description": "Resend email verification notification",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "email-verification"
-      ]
-    },
-    {
-      "id": "txn_009",
       "method": "GET",
-      "endpoint": "/forgot-password",
-      "description": "Display password reset link request form",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "password-reset"
-      ]
-    },
-    {
-      "id": "txn_010",
-      "method": "POST",
-      "endpoint": "/forgot-password",
-      "description": "Send password reset link to user email",
-      "requires_auth": false,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email",
-            "max:255"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "password-reset"
-      ]
-    },
-    {
-      "id": "txn_011",
-      "method": "GET",
-      "endpoint": "/reset-password/{token}",
-      "description": "Display password reset form",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "password-reset"
-      ]
-    },
-    {
-      "id": "txn_012",
-      "method": "POST",
-      "endpoint": "/reset-password",
-      "description": "Reset user password with token",
-      "requires_auth": false,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "confirmed",
-            "min:8"
-          ]
-        },
-        {
-          "name": "password_confirmation",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "token",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "password-reset"
-      ]
-    },
-    {
-      "id": "txn_013",
-      "method": "GET",
-      "endpoint": "/confirm-password",
-      "description": "Display password confirmation form",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth"
-      ]
-    },
-    {
-      "id": "txn_014",
-      "method": "POST",
-      "endpoint": "/confirm-password",
-      "description": "Confirm user password for sensitive actions",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "auth"
-      ]
-    },
-    {
-      "id": "txn_015",
-      "method": "GET",
-      "endpoint": "/password",
-      "description": "Display password change form",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_016",
-      "method": "PUT",
-      "endpoint": "/password",
-      "description": "Update user password",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "current_password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "current_password:web"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "confirmed",
-            "min:8"
-          ]
-        },
-        {
-          "name": "password_confirmation",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_017",
-      "method": "GET",
-      "endpoint": "/profile/complete",
-      "description": "Display profile completion form for OAuth users",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_018",
-      "method": "PUT",
-      "endpoint": "/profile/complete",
-      "description": "Complete user profile with real information",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "name",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:255"
-          ]
-        },
-        {
-          "name": "phone",
-          "type": "tel",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "phone_country",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "company_name",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_019",
-      "method": "GET",
-      "endpoint": "/auth/google/redirect",
-      "description": "Redirect user to Google OAuth authentication page",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "social-login"
-      ]
-    },
-    {
-      "id": "txn_020",
-      "method": "GET",
-      "endpoint": "/auth/google/callback",
-      "description": "Handle Google OAuth callback and login/register user",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "auth",
-        "social-login"
-      ]
-    },
-    {
-      "id": "txn_021",
-      "method": "GET",
-      "endpoint": "/profile",
-      "description": "Display user profile edit form",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_022",
-      "method": "PUT",
-      "endpoint": "/profile",
-      "description": "Update user profile information",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "name",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:255"
-          ]
-        },
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email",
-            "max:255",
-            "unique:users,email"
-          ]
-        },
-        {
-          "name": "phone",
-          "type": "tel",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "phone_country",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "company_name",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_023",
-      "method": "DELETE",
-      "endpoint": "/profile",
-      "description": "Delete user account (soft delete)",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "profile"
-      ]
-    },
-    {
-      "id": "txn_024",
-      "method": "GET",
-      "endpoint": "/data-requests",
-      "description": "List user's data requests",
+      "endpoint": "/reference/annual-report/grid",
+      "description": "Display annual report grid view",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
@@ -661,94 +251,952 @@
           "type": "text",
           "required": false,
           "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "status",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "start_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "end_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "sort_by",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "in:created_at,updated_at,request_code,title,purpose_type,status"
-          ]
+          "validation_rules": []
         },
         {
           "name": "sort",
-          "type": "text",
+          "type": "select",
           "required": false,
           "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "in:asc,desc"
-          ]
+          "validation_rules": []
         }
       ],
       "framework": "laravel",
       "tags": [
-        "data-request"
+        "annual-report",
+        "user-b"
       ]
     },
     {
-      "id": "txn_025",
+      "id": "txn_009",
       "method": "GET",
-      "endpoint": "/data-requests/create",
-      "description": "Display data request submission form",
+      "endpoint": "/reference/annual-report/list",
+      "description": "Display annual report list view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "annual-report",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_010",
+      "method": "GET",
+      "endpoint": "/reference/sustainability-report/grid",
+      "description": "Display sustainability report grid view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "sustainability-report",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_011",
+      "method": "GET",
+      "endpoint": "/reference/sustainability-report/list",
+      "description": "Display sustainability report list view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "sustainability-report",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_012",
+      "method": "GET",
+      "endpoint": "/list-buletin",
+      "description": "Display buletin list view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buletin",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_013",
+      "method": "GET",
+      "endpoint": "/grid-buletin",
+      "description": "Display buletin grid view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buletin",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_014",
+      "method": "GET",
+      "endpoint": "/search-buletin",
+      "description": "Search buletin",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buletin",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_015",
+      "method": "GET",
+      "endpoint": "/list-buku",
+      "description": "Display buku list view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buku",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_016",
+      "method": "GET",
+      "endpoint": "/grid-buku",
+      "description": "Display buku grid view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buku",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_017",
+      "method": "GET",
+      "endpoint": "/search-buku",
+      "description": "Search buku",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "buku",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_018",
+      "method": "GET",
+      "endpoint": "/hasil-survey/awareness",
+      "description": "Display brand awareness survey results",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "data-request"
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_019",
+      "method": "GET",
+      "endpoint": "/hasil-survey/position",
+      "description": "Display brand positioning survey results",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_020",
+      "method": "GET",
+      "endpoint": "/hasil-survey/cse",
+      "description": "Display customer satisfaction & engagement survey results",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_021",
+      "method": "GET",
+      "endpoint": "/hasil-survey/skl",
+      "description": "Display SKL (Survey Kepuasan Layanan) results",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_022",
+      "method": "GET",
+      "endpoint": "/hasil-survey/testimoni",
+      "description": "Display survey testimonials",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_023",
+      "method": "GET",
+      "endpoint": "/hasil-survey/dokumen_survey",
+      "description": "Display survey documents",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "survey",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_024",
+      "method": "GET",
+      "endpoint": "/list-agenda",
+      "description": "Display agenda list view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "agenda",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_025",
+      "method": "GET",
+      "endpoint": "/grid-agenda",
+      "description": "Display agenda grid/calendar view",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "month",
+          "type": "number",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "year",
+          "type": "number",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "agenda",
+        "user-b"
       ]
     },
     {
       "id": "txn_026",
+      "method": "GET",
+      "endpoint": "/show-agenda/{date?}",
+      "description": "Show agenda details for a specific date",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "agenda",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_027",
+      "method": "GET",
+      "endpoint": "/search-agenda",
+      "description": "Search agenda items",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "agenda",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_028",
+      "method": "GET",
+      "endpoint": "/presentasi",
+      "description": "Display presentation template index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "presentasi",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_029",
+      "method": "GET",
+      "endpoint": "/presentasi/search",
+      "description": "Search presentation templates",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "presentasi",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_030",
+      "method": "GET",
+      "endpoint": "/zoom-background",
+      "description": "Display zoom background index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "zoom-background",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_031",
+      "method": "GET",
+      "endpoint": "/zoom-background/search",
+      "description": "Search zoom backgrounds",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "zoom-background",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_032",
+      "method": "GET",
+      "endpoint": "/twibbon",
+      "description": "Display twibbon index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "twibbon",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_033",
+      "method": "GET",
+      "endpoint": "/logo",
+      "description": "Display official logo gallery",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "logo",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_034",
+      "method": "GET",
+      "endpoint": "/crm/data-client",
+      "description": "Display CRM data client index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "crm",
+        "user-k"
+      ]
+    },
+    {
+      "id": "txn_035",
+      "method": "GET",
+      "endpoint": "/crm/permohonan-akses",
+      "description": "Display CRM access request form page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "crm",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_036",
       "method": "POST",
-      "endpoint": "/data-requests",
-      "description": "Submit new data request with documents",
+      "endpoint": "/crm/permohonan-akses",
+      "description": "Submit CRM access request",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "title",
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "npk",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "email"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string"
+          ]
+        },
+        {
+          "name": "alasan",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "string"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "crm",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_037",
+      "method": "GET",
+      "endpoint": "/reference/company-profile",
+      "description": "Display company profile page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "company-profile",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_038",
+      "method": "GET",
+      "endpoint": "/picture/photo-video",
+      "description": "Display photo and video documentation index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "dokumentasi",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_039",
+      "method": "GET",
+      "endpoint": "/picture/photo-video/photo",
+      "description": "Display photo gallery index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "photo",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_040",
+      "method": "GET",
+      "endpoint": "/picture/photo-video/video",
+      "description": "Display video gallery index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "video",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_041",
+      "method": "GET",
+      "endpoint": "/flyer-ucapan",
+      "description": "Display flyer ucapan (greeting flyer) index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        },
+        {
+          "name": "sort",
+          "type": "select",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "flyer",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_042",
+      "method": "GET",
+      "endpoint": "/flyer-ucapan/search",
+      "description": "Search flyer ucapan",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "flyer",
+        "user-b"
+      ]
+    },
+    {
+      "id": "txn_043",
+      "method": "GET",
+      "endpoint": "/meida-monitoring",
+      "description": "Typo route - redirects to twibbon index (meida-monitoring instead of media-monitoring)",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "twibbon",
+        "user-b",
+        "typo"
+      ]
+    },
+    {
+      "id": "txn_044",
+      "method": "GET",
+      "endpoint": "/admin/dashboard/",
+      "description": "Admin dashboard - displays statistics and recent updates",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "dashboard"
+      ]
+    },
+    {
+      "id": "txn_045",
+      "method": "GET",
+      "endpoint": "/admin/profile/edit",
+      "description": "Admin profile edit page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "profile"
+      ]
+    },
+    {
+      "id": "txn_046",
+      "method": "PUT",
+      "endpoint": "/admin/profile/update",
+      "description": "Update admin profile with password change via NPK",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
           "type": "text",
           "required": true,
           "description": "",
@@ -759,40 +1207,173 @@
           ]
         },
         {
-          "name": "purpose_type",
-          "type": "select",
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "email",
+            "unique:user,email"
+          ]
+        },
+        {
+          "name": "unit",
+          "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
             "string",
-            "in:commercial,non_commercial_individu,non_commercial_instansi"
+            "max:255"
           ]
         },
         {
-          "name": "applicant_type",
-          "type": "select",
+          "name": "npk",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "tel",
           "required": false,
           "description": "",
           "validation_rules": [
             "nullable",
             "string",
-            "in:individu,instansi"
+            "max:255"
           ]
         },
         {
-          "name": "research_target_date",
+          "name": "tanggal_lahir",
           "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date"
+          ]
+        },
+        {
+          "name": "alamat",
+          "type": "textarea",
           "required": false,
           "description": "",
           "validation_rules": [
             "nullable",
-            "date",
-            "after:today"
+            "string"
           ]
         },
         {
-          "name": "form_pernyataan",
+          "name": "image",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "profile"
+      ]
+    },
+    {
+      "id": "txn_047",
+      "method": "GET",
+      "endpoint": "/admin/reference/annual-report/",
+      "description": "Admin annual report index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "annual-report"
+      ]
+    },
+    {
+      "id": "txn_048",
+      "method": "GET",
+      "endpoint": "/admin/reference/annual-report/create",
+      "description": "Admin annual report creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "annual-report"
+      ]
+    },
+    {
+      "id": "txn_049",
+      "method": "POST",
+      "endpoint": "/admin/reference/annual-report/",
+      "description": "Create new annual report with PDF and image upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "url",
           "type": "file",
           "required": true,
           "description": "",
@@ -800,818 +1381,184 @@
             "required",
             "file",
             "mimes:pdf",
-            "max:5120"
+            "max:10240"
           ]
         },
         {
-          "name": "company_name",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "data-request"
-      ]
-    },
-    {
-      "id": "txn_027",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}",
-      "description": "Show single data request details",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request"
-      ]
-    },
-    {
-      "id": "txn_028",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-document/{document}",
-      "description": "Download submission document",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_029",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-proof",
-      "description": "Preview payment proof (inline)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_030",
-      "method": "POST",
-      "endpoint": "/data-requests/{dataRequest}/payment-proof",
-      "description": "Upload payment proof",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "file",
+          "name": "foto",
           "type": "file",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "file",
-            "mimes:pdf,jpg,jpeg,png",
-            "max:5120"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_031",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-invoice",
-      "description": "Download latest invoice PDF",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_032",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-invoice",
-      "description": "Preview invoice inline",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_033",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-proof",
-      "description": "Download payment proof",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_034",
-      "method": "POST",
-      "endpoint": "/data-requests/{dataRequest}/request-new-invoice",
-      "description": "Request new invoice when current one expires",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_035",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-invoice/{invoice}",
-      "description": "Preview specific invoice by ID",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_036",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-invoice/{invoice}",
-      "description": "Download specific invoice by ID",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_037",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-proof/{invoice}",
-      "description": "Preview specific payment proof by invoice ID",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_038",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-proof/{invoice}",
-      "description": "Download specific payment proof by invoice ID",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_039",
-      "method": "POST",
-      "endpoint": "/data-requests/{dataRequest}/feedback",
-      "description": "Submit user feedback for completed request",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "feedback",
-          "type": "textarea",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "data-request"
-      ]
-    },
-    {
-      "id": "txn_040",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-all",
-      "description": "Download all processed documents as ZIP",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_041",
-      "method": "POST",
-      "endpoint": "/data-requests/{dataRequest}/survey-proof",
-      "description": "Submit survey proof document",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "survey_type",
-          "type": "select",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "in:technical,commercial,institutional"
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
           ]
         },
         {
-          "name": "file",
-          "type": "file",
+          "name": "kategori",
+          "type": "hidden",
           "required": true,
           "description": "",
           "validation_rules": [
-            "required",
-            "file",
-            "mimes:jpg,png,webp,svg",
-            "max:5120"
+            "laporanA"
           ]
         }
       ],
       "framework": "laravel",
       "tags": [
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_042",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-survey-proof/{survey}",
-      "description": "Preview survey proof document inline",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_043",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-survey-proof/{survey}",
-      "description": "Download survey proof document",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_044",
-      "method": "POST",
-      "endpoint": "/data-requests/{dataRequest}/product-upload",
-      "description": "Upload product/data upload files",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "files[]",
-          "type": "file",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "file",
-            "array",
-            "max:10"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_045",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/preview-product-upload/{upload}",
-      "description": "Preview product upload file inline",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_046",
-      "method": "GET",
-      "endpoint": "/data-requests/{dataRequest}/download-product-upload/{upload}",
-      "description": "Download product upload file",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_047",
-      "method": "DELETE",
-      "endpoint": "/data-requests/{dataRequest}/product-upload/{upload}",
-      "description": "Delete a product upload file",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_048",
-      "method": "GET",
-      "endpoint": "/track",
-      "description": "Track data request status publicly (no auth required)",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [
-        {
-          "name": "request_code",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:20"
-          ]
-        },
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "public",
-        "tracking"
-      ]
-    },
-    {
-      "id": "txn_049",
-      "method": "GET",
-      "endpoint": "/help",
-      "description": "Display help/FAQ landing page",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "public",
-        "help"
+        "admin",
+        "annual-report"
       ]
     },
     {
       "id": "txn_050",
       "method": "GET",
-      "endpoint": "/faqs/{faq}/download",
-      "description": "Download FAQ document (public if active, admin if inactive)",
-      "requires_auth": false,
+      "endpoint": "/admin/reference/annual-report/{id}",
+      "description": "Show specific annual report",
+      "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "public",
-        "faq"
+        "admin",
+        "annual-report"
       ]
     },
     {
       "id": "txn_051",
       "method": "GET",
-      "endpoint": "/admin/dashboard",
-      "description": "Display admin dashboard",
+      "endpoint": "/admin/reference/annual-report/{id}/edit",
+      "description": "Edit annual report form",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "admin"
+        "admin",
+        "annual-report"
       ]
     },
     {
       "id": "txn_052",
-      "method": "GET",
-      "endpoint": "/admin/catalogs",
-      "description": "List catalog items",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "catalog"
-      ]
-    },
-    {
-      "id": "txn_053",
-      "method": "POST",
-      "endpoint": "/admin/catalogs",
-      "description": "Create new catalog item",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "title",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "category_id",
-          "type": "number",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "numeric"
-          ]
-        },
-        {
-          "name": "price",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "unit",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "is_active",
-          "type": "checkbox",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "boolean"
-          ]
-        },
-        {
-          "name": "description",
-          "type": "textarea",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "catalog"
-      ]
-    },
-    {
-      "id": "txn_054",
       "method": "PUT",
-      "endpoint": "/admin/catalogs/{catalog}",
-      "description": "Update catalog item",
+      "endpoint": "/admin/reference/annual-report/{id}",
+      "description": "Update existing annual report",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "title",
+          "name": "nama",
           "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "string"
+            "string",
+            "max:255"
           ]
         },
         {
-          "name": "category_id",
+          "name": "tahun",
           "type": "number",
-          "required": false,
+          "required": true,
           "description": "",
           "validation_rules": [
-            "nullable",
-            "numeric"
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
           ]
         },
         {
-          "name": "price",
+          "name": "deskripsi",
           "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "string"
-          ]
-        },
-        {
-          "name": "unit",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "is_active",
-          "type": "checkbox",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "boolean"
-          ]
-        },
-        {
-          "name": "description",
-          "type": "textarea",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "catalog"
-      ]
-    },
-    {
-      "id": "txn_055",
-      "method": "DELETE",
-      "endpoint": "/admin/catalogs/{catalog}",
-      "description": "Delete catalog item",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "catalog"
-      ]
-    },
-    {
-      "id": "txn_056",
-      "method": "GET",
-      "endpoint": "/admin/data-requests",
-      "description": "List all data requests for admin review with filters",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [
-        {
-          "name": "status",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "search",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "purpose",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "date_from",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "date_to",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "sort",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
             "string",
-            "in:asc,desc"
+            "max:1024"
           ]
         },
         {
-          "name": "sort_by",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "in:created_at,updated_at,request_code"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request"
-      ]
-    },
-    {
-      "id": "txn_057",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}",
-      "description": "Show single data request with full details for admin review",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request"
-      ]
-    },
-    {
-      "id": "txn_058",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/verify",
-      "description": "Approve or reject a data request",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "action",
-          "type": "select",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "in:approve,reject"
-          ]
-        },
-        {
-          "name": "rejection_reason",
-          "type": "textarea",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "invoice_file",
+          "name": "url",
           "type": "file",
           "required": false,
           "description": "",
           "validation_rules": [
             "nullable",
             "file",
-            "mimes:pdf,jpg,jpeg,png"
+            "mimes:pdf",
+            "max:10240"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
           ]
         }
       ],
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "verification"
+        "annual-report"
       ]
     },
     {
-      "id": "txn_059",
+      "id": "txn_053",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/annual-report/{id}",
+      "description": "Delete annual report and associated files",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "annual-report"
+      ]
+    },
+    {
+      "id": "txn_054",
       "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/invoice-ocr-status",
-      "description": "Get OCR processing status for invoice",
+      "endpoint": "/admin/annual/search",
+      "description": "Search annual reports",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "annual-report"
+      ]
+    },
+    {
+      "id": "txn_055",
+      "method": "GET",
+      "endpoint": "/admin/reference/sustain-report/",
+      "description": "Admin sustainability report index",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
@@ -1619,99 +1566,587 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "invoice"
+        "sustainability-report"
       ]
     },
     {
-      "id": "txn_060",
+      "id": "txn_056",
+      "method": "GET",
+      "endpoint": "/admin/reference/sustain-report/create",
+      "description": "Admin sustainability report creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_057",
       "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/invoices/payment-details/update",
-      "description": "Update invoice payment details (amount, billing code, expiry)",
+      "endpoint": "/admin/reference/sustain-report/",
+      "description": "Create new sustainability report with PDF and image upload",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "amount",
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "laporanS"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_058",
+      "method": "GET",
+      "endpoint": "/admin/reference/sustain-report/{id}",
+      "description": "Show specific sustainability report",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_059",
+      "method": "GET",
+      "endpoint": "/admin/reference/sustain-report/{id}/edit",
+      "description": "Edit sustainability report form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_060",
+      "method": "PUT",
+      "endpoint": "/admin/reference/sustain-report/{id}",
+      "description": "Update existing sustainability report",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1024"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_061",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/sustain-report/{id}",
+      "description": "Delete sustainability report and associated files",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_062",
+      "method": "GET",
+      "endpoint": "/admin/sustain/search",
+      "description": "Search sustainability reports",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "sustainability-report"
+      ]
+    },
+    {
+      "id": "txn_063",
+      "method": "GET",
+      "endpoint": "/admin/reference/buku/",
+      "description": "Admin buku (book) index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_064",
+      "method": "GET",
+      "endpoint": "/admin/reference/buku/create",
+      "description": "Admin buku creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_065",
+      "method": "POST",
+      "endpoint": "/admin/reference/buku/",
+      "description": "Create new buku with PDF and image upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "buku"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_066",
+      "method": "GET",
+      "endpoint": "/admin/reference/buku/{id}",
+      "description": "Show specific buku",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_067",
+      "method": "GET",
+      "endpoint": "/admin/reference/buku/{id}/edit",
+      "description": "Edit buku form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_068",
+      "method": "PUT",
+      "endpoint": "/admin/reference/buku/{id}",
+      "description": "Update existing buku",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "integer",
+            "min:1900",
+            "max:current_year"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1024"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_069",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/buku/{id}",
+      "description": "Delete buku and associated files",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_070",
+      "method": "GET",
+      "endpoint": "/admin/buku/search",
+      "description": "Search buku",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buku"
+      ]
+    },
+    {
+      "id": "txn_071",
+      "method": "GET",
+      "endpoint": "/admin/reference/buletin/",
+      "description": "Admin buletin index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_072",
+      "method": "GET",
+      "endpoint": "/admin/reference/buletin/create",
+      "description": "Admin buletin creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_073",
+      "method": "POST",
+      "endpoint": "/admin/reference/buletin/",
+      "description": "Create new buletin with image and PDF upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
           "type": "number",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
             "numeric",
-            "min:1"
+            "min:2000",
+            "max:2100"
           ]
         },
         {
-          "name": "billing_code",
+          "name": "deskripsi",
           "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "string"
+            "string",
+            "max:1000"
           ]
         },
         {
-          "name": "expires_at",
-          "type": "datetime",
+          "name": "foto",
+          "type": "file",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "date"
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
           ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "invoice"
-      ]
-    },
-    {
-      "id": "txn_061",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-document/{document}",
-      "description": "Download submission document (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_062",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-document/{document}",
-      "description": "Preview submission document inline (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_063",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/payment-invoice",
-      "description": "Upload payment invoice (admin)",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
+        },
         {
           "name": "file",
           "type": "file",
@@ -1720,60 +2155,271 @@
           "validation_rules": [
             "required",
             "file",
-            "mimes:pdf,jpg,jpeg,png",
-            "max:5120"
+            "mimes:pdf",
+            "max:10240"
           ]
         },
         {
-          "name": "amount",
-          "type": "number",
-          "required": false,
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
           "description": "",
           "validation_rules": [
-            "nullable",
-            "numeric"
+            "buletin"
           ]
         },
         {
-          "name": "billing_code",
-          "type": "text",
-          "required": false,
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
           "description": "",
           "validation_rules": [
-            "nullable",
-            "string"
+            "pdf"
           ]
         }
       ],
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "payment"
+        "buletin"
       ]
     },
     {
-      "id": "txn_064",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/verify-payment",
-      "description": "Verify or reject payment proof",
+      "id": "txn_074",
+      "method": "GET",
+      "endpoint": "/admin/reference/buletin/search",
+      "description": "Search buletin",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_075",
+      "method": "GET",
+      "endpoint": "/admin/reference/buletin/{id}",
+      "description": "Show specific buletin",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_076",
+      "method": "GET",
+      "endpoint": "/admin/reference/buletin/{id}/edit",
+      "description": "Edit buletin form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_077",
+      "method": "PUT",
+      "endpoint": "/admin/reference/buletin/{id}",
+      "description": "Update existing buletin",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "action",
-          "type": "select",
+          "name": "nama",
+          "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
             "string",
-            "in:accept,reject"
+            "max:255"
           ]
         },
         {
-          "name": "rejection_reason",
+          "name": "tahun",
+          "type": "number",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "numeric",
+            "min:2000",
+            "max:2100"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "file",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_078",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/buletin/{id}",
+      "description": "Delete buletin and associated files",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "buletin"
+      ]
+    },
+    {
+      "id": "txn_079",
+      "method": "GET",
+      "endpoint": "/admin/reference/agenda/",
+      "description": "Admin agenda index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "agenda"
+      ]
+    },
+    {
+      "id": "txn_080",
+      "method": "GET",
+      "endpoint": "/admin/reference/agenda/create",
+      "description": "Admin agenda creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "agenda"
+      ]
+    },
+    {
+      "id": "txn_081",
+      "method": "POST",
+      "endpoint": "/admin/reference/agenda/",
+      "description": "Create new agenda item",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama_agenda",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "prioritas",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:rendah,sedang,tinggi"
+          ]
+        },
+        {
+          "name": "tanggal_mulai",
+          "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date"
+          ]
+        },
+        {
+          "name": "tanggal_deadline",
+          "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date",
+            "after:tanggal_mulai"
+          ]
+        },
+        {
+          "name": "catatan",
           "type": "textarea",
           "required": false,
           "description": "",
@@ -1786,68 +2432,146 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "payment"
+        "agenda"
       ]
     },
     {
-      "id": "txn_065",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/process",
-      "description": "Start processing data request after payment verification",
+      "id": "txn_082",
+      "method": "GET",
+      "endpoint": "/admin/reference/agenda/search",
+      "description": "Search agenda items",
       "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "agenda"
+      ]
+    },
+    {
+      "id": "txn_083",
+      "method": "GET",
+      "endpoint": "/admin/reference/agenda/{id}",
+      "description": "Show specific agenda item",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request"
+        "agenda"
       ]
     },
     {
-      "id": "txn_066",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/processed-documents",
-      "description": "Upload processed result documents",
+      "id": "txn_084",
+      "method": "GET",
+      "endpoint": "/admin/reference/agenda/{id}/edit",
+      "description": "Edit agenda form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "agenda"
+      ]
+    },
+    {
+      "id": "txn_085",
+      "method": "PUT",
+      "endpoint": "/admin/reference/agenda/{id}",
+      "description": "Update existing agenda item",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "files[]",
-          "type": "file",
+          "name": "nama_agenda",
+          "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
-            "file",
-            "array"
+            "string",
+            "max:255"
           ]
         },
         {
-          "name": "required_surveys",
-          "type": "array",
+          "name": "divisi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "prioritas",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:rendah,sedang,tinggi"
+          ]
+        },
+        {
+          "name": "tanggal_mulai",
+          "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date"
+          ]
+        },
+        {
+          "name": "tanggal_deadline",
+          "type": "date",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "date",
+            "after:tanggal_mulai"
+          ]
+        },
+        {
+          "name": "catatan",
+          "type": "textarea",
           "required": false,
           "description": "",
           "validation_rules": [
             "nullable",
-            "array"
+            "string"
           ]
         }
       ],
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "documents"
+        "agenda"
       ]
     },
     {
-      "id": "txn_067",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/complaint-resolved",
-      "description": "Mark complaint as resolved",
+      "id": "txn_086",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/agenda/{id}",
+      "description": "Delete agenda item",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
@@ -1855,20 +2579,240 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request"
+        "agenda"
       ]
     },
     {
-      "id": "txn_068",
+      "id": "txn_087",
+      "method": "GET",
+      "endpoint": "/admin/reference/media-monitoring/",
+      "description": "Admin media monitoring index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_088",
+      "method": "GET",
+      "endpoint": "/admin/reference/media-monitoring/create",
+      "description": "Admin media monitoring creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_089",
       "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/processed-documents/replace",
-      "description": "Replace a processed result document",
+      "endpoint": "/admin/reference/media-monitoring/",
+      "description": "Create new media monitoring entry",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "file",
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:positive,negative,neutral"
+          ]
+        },
+        {
+          "name": "kesimpulan",
+          "type": "textarea",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "link",
+          "type": "url",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "url",
+            "max:255"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_090",
+      "method": "GET",
+      "endpoint": "/admin/reference/media-monitoring/{id}/edit",
+      "description": "Edit media monitoring form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_091",
+      "method": "PUT",
+      "endpoint": "/admin/reference/media-monitoring/{id}",
+      "description": "Update existing media monitoring entry",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:positive,negative,neutral"
+          ]
+        },
+        {
+          "name": "kesimpulan",
+          "type": "textarea",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "link",
+          "type": "url",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "url",
+            "max:255"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_092",
+      "method": "DELETE",
+      "endpoint": "/admin/reference/media-monitoring/{id}",
+      "description": "Delete media monitoring entry",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_093",
+      "method": "GET",
+      "endpoint": "/admin/reference/media-monitoring/search",
+      "description": "Search media monitoring entries",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "media-monitoring"
+      ]
+    },
+    {
+      "id": "txn_094",
+      "method": "GET",
+      "endpoint": "/admin/reference/presentasi/",
+      "description": "Admin presentation template index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "presentasi"
+      ]
+    },
+    {
+      "id": "txn_095",
+      "method": "GET",
+      "endpoint": "/admin/reference/presentasi/create",
+      "description": "Admin presentation template creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "presentasi"
+      ]
+    },
+    {
+      "id": "txn_096",
+      "method": "POST",
+      "endpoint": "/admin/reference/presentasi/",
+      "description": "Create new presentation template with file upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "url",
           "type": "file",
           "required": true,
           "description": "",
@@ -1881,58 +2825,14 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "documents"
+        "presentasi"
       ]
     },
     {
-      "id": "txn_069",
-      "method": "DELETE",
-      "endpoint": "/admin/data-requests/{dataRequest}/processed-documents/{document}",
-      "description": "Delete a processed result document",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_070",
-      "method": "DELETE",
-      "endpoint": "/admin/data-requests/{dataRequest}/processed-documents/bulk-destroy",
-      "description": "Delete multiple processed result documents",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "document_ids[]",
-          "type": "array",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "array"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "documents"
-      ]
-    },
-    {
-      "id": "txn_071",
+      "id": "txn_097",
       "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-invoice",
-      "description": "Preview invoice inline (admin)",
+      "endpoint": "/admin/reference/presentasi/{id}/edit",
+      "description": "Edit presentation template form",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
@@ -1940,527 +2840,51 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "payment"
+        "presentasi"
       ]
     },
     {
-      "id": "txn_072",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-invoice",
-      "description": "Download invoice PDF (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_073",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-proof",
-      "description": "Preview payment proof inline (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_074",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-proof",
-      "description": "Download payment proof (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_075",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-invoice/{invoice}",
-      "description": "Preview specific invoice by ID (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_076",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-invoice/{invoice}",
-      "description": "Download specific invoice by ID (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "payment"
-      ]
-    },
-    {
-      "id": "txn_077",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/verify-survey",
-      "description": "Verify or reject a survey submission",
+      "id": "txn_098",
+      "method": "PUT",
+      "endpoint": "/admin/reference/presentasi/{id}",
+      "description": "Update existing presentation template",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "action",
-          "type": "select",
+          "name": "nama",
+          "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
             "string",
-            "in:approve,reject"
+            "max:255"
           ]
         },
         {
-          "name": "rejection_reason",
-          "type": "textarea",
+          "name": "url",
+          "type": "file",
           "required": false,
           "description": "",
           "validation_rules": [
             "nullable",
-            "string"
+            "file"
           ]
         }
       ],
       "framework": "laravel",
       "tags": [
         "admin",
-        "data-request",
-        "survey"
+        "presentasi"
       ]
     },
     {
-      "id": "txn_078",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-survey-proof/{survey}",
-      "description": "Preview survey proof inline (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_079",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-survey-proof/{survey}",
-      "description": "Download survey proof document (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_080",
-      "method": "POST",
-      "endpoint": "/admin/data-requests/{dataRequest}/update-required-surveys",
-      "description": "Update required surveys for a data request",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "required_surveys",
-          "type": "array",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "array"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_081",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/preview-product-upload/{upload}",
-      "description": "Preview product upload file inline (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_082",
-      "method": "GET",
-      "endpoint": "/admin/data-requests/{dataRequest}/download-product-upload/{upload}",
-      "description": "Download product upload file (admin)",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "data-request",
-        "upload"
-      ]
-    },
-    {
-      "id": "txn_083",
-      "method": "GET",
-      "endpoint": "/admin/reports/data-requests",
-      "description": "Display data request report page with preview",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [
-        {
-          "name": "start_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "end_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "status",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "report",
-          "type": "select",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "in:requests,users"
-          ]
-        },
-        {
-          "name": "preview",
-          "type": "boolean",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "boolean"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "report"
-      ]
-    },
-    {
-      "id": "txn_084",
-      "method": "POST",
-      "endpoint": "/admin/exports/data-requests",
-      "description": "Export data requests report to XLSX",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "start_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "end_date",
-          "type": "date",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "date"
-          ]
-        },
-        {
-          "name": "status",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "export",
-        "report"
-      ]
-    },
-    {
-      "id": "txn_085",
-      "method": "POST",
-      "endpoint": "/admin/exports/users",
-      "description": "Export user data report to XLSX",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "export"
-      ]
-    },
-    {
-      "id": "txn_086",
-      "method": "GET",
-      "endpoint": "/admin/faqs",
-      "description": "List all FAQs",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_087",
-      "method": "GET",
-      "endpoint": "/admin/faqs/create",
-      "description": "Display FAQ creation form",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_088",
-      "method": "POST",
-      "endpoint": "/admin/faqs",
-      "description": "Create new FAQ entry",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "question",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "answer",
-          "type": "textarea",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "order",
-          "type": "number",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "integer"
-          ]
-        },
-        {
-          "name": "is_active",
-          "type": "checkbox",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "boolean"
-          ]
-        },
-        {
-          "name": "category",
-          "type": "select",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_089",
-      "method": "GET",
-      "endpoint": "/admin/faqs/{faq}/edit",
-      "description": "Display FAQ edit form",
-      "requires_auth": true,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_090",
-      "method": "PUT",
-      "endpoint": "/admin/faqs/{faq}",
-      "description": "Update existing FAQ entry",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "question",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "answer",
-          "type": "textarea",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "order",
-          "type": "number",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "integer"
-          ]
-        },
-        {
-          "name": "is_active",
-          "type": "checkbox",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "boolean"
-          ]
-        },
-        {
-          "name": "category",
-          "type": "select",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_091",
+      "id": "txn_099",
       "method": "DELETE",
-      "endpoint": "/admin/faqs/{faq}",
-      "description": "Delete FAQ entry (soft delete)",
+      "endpoint": "/admin/reference/presentasi/{id}",
+      "description": "Delete presentation template and associated file",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
@@ -2468,173 +2892,14 @@
       "framework": "laravel",
       "tags": [
         "admin",
-        "faq"
+        "presentasi"
       ]
     },
     {
-      "id": "txn_092",
-      "method": "POST",
-      "endpoint": "/admin/faqs/reorder",
-      "description": "Reorder FAQ entries",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "orders",
-          "type": "object",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "object"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "faq"
-      ]
-    },
-    {
-      "id": "txn_093",
-      "method": "PUT",
-      "endpoint": "/admin/contact-settings",
-      "description": "Update contact settings (address, phone, social links)",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "cs_email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "email"
-          ]
-        },
-        {
-          "name": "cs_phone",
-          "type": "tel",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "cs_address",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "cs_facebook",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        },
-        {
-          "name": "cs_instagram",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        },
-        {
-          "name": "cs_twitter",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        },
-        {
-          "name": "cs_whatsapp",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        },
-        {
-          "name": "cs_youtube",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        },
-        {
-          "name": "cs_tiktok",
-          "type": "url",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "url"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "settings"
-      ]
-    },
-    {
-      "id": "txn_094",
-      "method": "PUT",
-      "endpoint": "/admin/survey-settings",
-      "description": "Update survey settings configuration",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "surveys",
-          "type": "object",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "object"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "settings",
-        "survey"
-      ]
-    },
-    {
-      "id": "txn_095",
+      "id": "txn_100",
       "method": "GET",
-      "endpoint": "/admin/users",
-      "description": "List all users with search/role filters",
+      "endpoint": "/admin/reference/search",
+      "description": "Search presentation templates (admin)",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
@@ -2644,285 +2909,1642 @@
           "type": "text",
           "required": false,
           "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
-        },
-        {
-          "name": "role",
-          "type": "text",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string"
-          ]
+          "validation_rules": []
         }
       ],
       "framework": "laravel",
       "tags": [
         "admin",
-        "user-management"
-      ]
-    },
-    {
-      "id": "txn_096",
-      "method": "POST",
-      "endpoint": "/admin/users",
-      "description": "Create new admin/superadmin user",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "name",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:255"
-          ]
-        },
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email",
-            "max:255",
-            "unique:users,email"
-          ]
-        },
-        {
-          "name": "phone",
-          "type": "tel",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "phone_country",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "role",
-          "type": "select",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "in:admin,superadmin"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "confirmed",
-            "min:8"
-          ]
-        },
-        {
-          "name": "password_confirmation",
-          "type": "password",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "user-management"
-      ]
-    },
-    {
-      "id": "txn_097",
-      "method": "PUT",
-      "endpoint": "/admin/users/{user}",
-      "description": "Update user role and profile information",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [
-        {
-          "name": "role",
-          "type": "select",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "in:admin,superadmin"
-          ]
-        },
-        {
-          "name": "name",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "max:255"
-          ]
-        },
-        {
-          "name": "email",
-          "type": "email",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string",
-            "email",
-            "max:255",
-            "unique:users,email"
-          ]
-        },
-        {
-          "name": "phone",
-          "type": "tel",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "phone_country",
-          "type": "text",
-          "required": true,
-          "description": "",
-          "validation_rules": [
-            "required",
-            "string"
-          ]
-        },
-        {
-          "name": "password",
-          "type": "password",
-          "required": false,
-          "description": "",
-          "validation_rules": [
-            "nullable",
-            "string",
-            "min:8"
-          ]
-        }
-      ],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "user-management"
-      ]
-    },
-    {
-      "id": "txn_098",
-      "method": "POST",
-      "endpoint": "/admin/users/{user}/reset-password",
-      "description": "Reset another user's password (admin action)",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "user-management"
-      ]
-    },
-    {
-      "id": "txn_099",
-      "method": "DELETE",
-      "endpoint": "/admin/users/{user}",
-      "description": "Soft-delete a user account",
-      "requires_auth": true,
-      "requires_csrf": true,
-      "csrf_field_name": "_token",
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "admin",
-        "user-management"
-      ]
-    },
-    {
-      "id": "txn_100",
-      "method": "GET",
-      "endpoint": "/api/chatbot/status",
-      "description": "Get chatbot status and configuration",
-      "requires_auth": false,
-      "requires_csrf": false,
-      "csrf_field_name": null,
-      "fields": [],
-      "framework": "laravel",
-      "tags": [
-        "chatbot",
-        "api"
+        "presentasi"
       ]
     },
     {
       "id": "txn_101",
       "method": "GET",
-      "endpoint": "/api/chatbot/suggested-questions",
-      "description": "Get suggested questions for quick start",
-      "requires_auth": false,
+      "endpoint": "/admin/picture/zoom-background/",
+      "description": "Admin zoom background index",
+      "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "chatbot",
-        "api"
+        "admin",
+        "zoom-background"
       ]
     },
     {
       "id": "txn_102",
+      "method": "GET",
+      "endpoint": "/admin/picture/zoom-background/create",
+      "description": "Admin zoom background creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_103",
       "method": "POST",
-      "endpoint": "/api/chatbot/message",
-      "description": "Send message to chatbot and get AI response",
-      "requires_auth": false,
+      "endpoint": "/admin/picture/zoom-background/",
+      "description": "Create new zoom background with image upload",
+      "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [
         {
-          "name": "message",
+          "name": "nama",
           "type": "text",
           "required": true,
           "description": "",
           "validation_rules": [
             "required",
             "string",
-            "max:500"
+            "max:255"
           ]
         },
         {
-          "name": "conversation_id",
+          "name": "url",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "file",
+            "mimes:jpg,jpeg,png"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_104",
+      "method": "GET",
+      "endpoint": "/admin/picture/zoom-background/{id}/edit",
+      "description": "Edit zoom background form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_105",
+      "method": "PUT",
+      "endpoint": "/admin/picture/zoom-background/{id}",
+      "description": "Update existing zoom background",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "file",
+            "mimes:jpg,jpeg,png"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_106",
+      "method": "DELETE",
+      "endpoint": "/admin/picture/zoom-background/{id}",
+      "description": "Delete zoom background and associated file",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_107",
+      "method": "GET",
+      "endpoint": "/admin/zoom-background/search",
+      "description": "Search zoom backgrounds",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "zoom-background"
+      ]
+    },
+    {
+      "id": "txn_108",
+      "method": "GET",
+      "endpoint": "/admin/picture/twibbon/",
+      "description": "Admin twibbon index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_109",
+      "method": "GET",
+      "endpoint": "/admin/picture/twibbon/create",
+      "description": "Admin twibbon creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_110",
+      "method": "POST",
+      "endpoint": "/admin/picture/twibbon/",
+      "description": "Create new twibbon with image upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "url",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "url",
+            "max:255"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "twibbon"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_111",
+      "method": "GET",
+      "endpoint": "/admin/picture/twibbon/{id}",
+      "description": "Show specific twibbon",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_112",
+      "method": "GET",
+      "endpoint": "/admin/picture/twibbon/{id}/edit",
+      "description": "Edit twibbon form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_113",
+      "method": "PUT",
+      "endpoint": "/admin/picture/twibbon/{id}",
+      "description": "Update existing twibbon",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "url",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "url",
+            "max:255"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_114",
+      "method": "DELETE",
+      "endpoint": "/admin/picture/twibbon/{id}",
+      "description": "Delete twibbon and associated file",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_115",
+      "method": "GET",
+      "endpoint": "/admin/twibbon/search",
+      "description": "Search twibbons",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "twibbon"
+      ]
+    },
+    {
+      "id": "txn_116",
+      "method": "GET",
+      "endpoint": "/admin/picture/photo",
+      "description": "Admin photo index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_117",
+      "method": "GET",
+      "endpoint": "/admin/picture/photo/create",
+      "description": "Admin photo creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_118",
+      "method": "POST",
+      "endpoint": "/admin/picture/photo",
+      "description": "Create new photo entry with image upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "dokum_foto"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "url"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_119",
+      "method": "GET",
+      "endpoint": "/admin/picture/photo/{id}/edit",
+      "description": "Edit photo form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_120",
+      "method": "PUT",
+      "endpoint": "/admin/picture/photo/{id}",
+      "description": "Update existing photo entry",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_121",
+      "method": "DELETE",
+      "endpoint": "/admin/picture/photo/{id}",
+      "description": "Delete photo and associated file",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_122",
+      "method": "GET",
+      "endpoint": "/admin/photo/search",
+      "description": "Search photos",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "photo"
+      ]
+    },
+    {
+      "id": "txn_123",
+      "method": "GET",
+      "endpoint": "/admin/picture/video",
+      "description": "Admin video index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_124",
+      "method": "GET",
+      "endpoint": "/admin/picture/video/create",
+      "description": "Admin video creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_125",
+      "method": "POST",
+      "endpoint": "/admin/picture/video",
+      "description": "Create new video entry with file upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "video",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "mimes:mp4,mov,avi",
+            "max:102400"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "dokum_video"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "video"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "url"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_126",
+      "method": "GET",
+      "endpoint": "/admin/picture/video/{id}/edit",
+      "description": "Edit video form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_127",
+      "method": "PUT",
+      "endpoint": "/admin/picture/video/{id}",
+      "description": "Update existing video entry",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "video",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "mimes:mp4,mov,avi",
+            "max:102400"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "video"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "dokum_video"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_128",
+      "method": "DELETE",
+      "endpoint": "/admin/picture/video/{id}",
+      "description": "Delete video and associated file",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_129",
+      "method": "GET",
+      "endpoint": "/admin/video/search",
+      "description": "Search videos",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "video"
+      ]
+    },
+    {
+      "id": "txn_130",
+      "method": "GET",
+      "endpoint": "/admin/picture/flyer",
+      "description": "Admin flyer index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_131",
+      "method": "GET",
+      "endpoint": "/admin/picture/flyer/create",
+      "description": "Admin flyer creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_132",
+      "method": "POST",
+      "endpoint": "/admin/picture/flyer",
+      "description": "Create new flyer with image upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "kategori",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "flyer"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "url"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_133",
+      "method": "GET",
+      "endpoint": "/admin/picture/flyer/{id}/edit",
+      "description": "Edit flyer form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_134",
+      "method": "PUT",
+      "endpoint": "/admin/picture/flyer/{id}",
+      "description": "Update existing flyer",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg,gif",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "tipe",
+          "type": "hidden",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "image"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "hidden",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "url"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "hidden",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_135",
+      "method": "DELETE",
+      "endpoint": "/admin/picture/flyer/{id}",
+      "description": "Delete flyer and associated file",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_136",
+      "method": "GET",
+      "endpoint": "/admin/flyer/search",
+      "description": "Search flyers",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "flyer"
+      ]
+    },
+    {
+      "id": "txn_137",
+      "method": "GET",
+      "endpoint": "/admin/crm/data-client",
+      "description": "Admin CRM data client index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_138",
+      "method": "GET",
+      "endpoint": "/admin/crm/data-client/search",
+      "description": "Search CRM data clients",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_139",
+      "method": "GET",
+      "endpoint": "/admin/crm/data-client/create",
+      "description": "Admin CRM data client creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_140",
+      "method": "POST",
+      "endpoint": "/admin/crm/data-client",
+      "description": "Create new CRM data client",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "email",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:20"
+          ]
+        },
+        {
+          "name": "alamat_perusahaan",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "status_project",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:current,past,potential"
+          ]
+        },
+        {
+          "name": "id_user",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "exists:user,id_user"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_141",
+      "method": "GET",
+      "endpoint": "/admin/crm/data-client/{id}/edit",
+      "description": "Edit CRM data client form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_142",
+      "method": "PUT",
+      "endpoint": "/admin/crm/data-client/{id}",
+      "description": "Update existing CRM data client",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "email",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:20"
+          ]
+        },
+        {
+          "name": "alamat_perusahaan",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string"
+          ]
+        },
+        {
+          "name": "status_project",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:current,past,potential"
+          ]
+        },
+        {
+          "name": "id_user",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "exists:user,id_user"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_143",
+      "method": "DELETE",
+      "endpoint": "/admin/crm/data-client/{id}",
+      "description": "Delete CRM data client",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_144",
+      "method": "GET",
+      "endpoint": "/admin/crm/permohonan",
+      "description": "Admin CRM permohonan (request) index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_145",
+      "method": "GET",
+      "endpoint": "/admin/crm/permohonan/search",
+      "description": "Search CRM permohonan",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_146",
+      "method": "GET",
+      "endpoint": "/admin/crm/permohonan/{id}",
+      "description": "Show specific CRM permohonan detail",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_147",
+      "method": "PUT",
+      "endpoint": "/admin/crm/permohonan/{id}/approve",
+      "description": "Approve CRM access request and update user role to userk",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_148",
+      "method": "PUT",
+      "endpoint": "/admin/crm/permohonan/{id}/reject",
+      "description": "Reject CRM access request",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "crm"
+      ]
+    },
+    {
+      "id": "txn_149",
+      "method": "GET",
+      "endpoint": "/admin/hasil-survey-brand",
+      "description": "Admin Hasil Survey Brand main index",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey"
+      ]
+    },
+    {
+      "id": "txn_150",
+      "method": "GET",
+      "endpoint": "/admin/hasil-survey-brand/awareness",
+      "description": "Admin Brand Awareness survey static page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey"
+      ]
+    },
+    {
+      "id": "txn_151",
+      "method": "GET",
+      "endpoint": "/admin/hasil-survey-brand/positioning",
+      "description": "Admin Brand Positioning survey static page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey"
+      ]
+    },
+    {
+      "id": "txn_152",
+      "method": "GET",
+      "endpoint": "/admin/hasil-survey-brand/cse",
+      "description": "Admin Customer Satisfaction & Engagement survey static page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey"
+      ]
+    },
+    {
+      "id": "txn_153",
+      "method": "GET",
+      "endpoint": "/admin/hasil-survey-brand/skl",
+      "description": "Admin SKL (Survey Kepuasan Layanan) static page",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey"
+      ]
+    },
+    {
+      "id": "txn_154",
+      "method": "GET",
+      "endpoint": "/admin/users",
+      "description": "Admin users index (paginated list)",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [
+        {
+          "name": "search",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": []
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "users"
+      ]
+    },
+    {
+      "id": "txn_155",
+      "method": "GET",
+      "endpoint": "/admin/users/create",
+      "description": "Admin user creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "users"
+      ]
+    },
+    {
+      "id": "txn_156",
+      "method": "POST",
+      "endpoint": "/admin/users",
+      "description": "Create new admin user with hashed NPK password",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "email",
+            "max:255",
+            "unique:user,email"
+          ]
+        },
+        {
+          "name": "npk",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255",
+            "unique:user,npk"
+          ]
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "tel",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:20"
+          ]
+        },
+        {
+          "name": "tanggal_lahir",
+          "type": "date",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "date"
+          ]
+        },
+        {
+          "name": "alamat",
           "type": "text",
           "required": false,
           "description": "",
@@ -2930,63 +4552,450 @@
             "nullable",
             "string"
           ]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:userb,userk,admin"
+          ]
+        },
+        {
+          "name": "image",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
         }
       ],
       "framework": "laravel",
       "tags": [
-        "chatbot",
-        "api"
+        "admin",
+        "users"
       ]
     },
     {
-      "id": "txn_103",
+      "id": "txn_157",
       "method": "GET",
-      "endpoint": "/api/chatbot/conversations/{conversation}",
-      "description": "Get a specific conversation with its messages",
+      "endpoint": "/admin/users/{user}",
+      "description": "Show specific admin user",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "chatbot",
-        "api"
+        "admin",
+        "users"
       ]
     },
     {
-      "id": "txn_104",
-      "method": "POST",
-      "endpoint": "/api/chatbot/conversations/{conversation}/archive",
-      "description": "Archive a conversation",
+      "id": "txn_158",
+      "method": "GET",
+      "endpoint": "/admin/users/{user}/edit",
+      "description": "Edit admin user form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "users"
+      ]
+    },
+    {
+      "id": "txn_159",
+      "method": "PUT",
+      "endpoint": "/admin/users/{user}",
+      "description": "Update existing admin user with optional password reset via NPK",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "email",
+            "max:255",
+            "unique:user,email"
+          ]
+        },
+        {
+          "name": "npk",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255",
+            "unique:user,npk"
+          ]
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "divisi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "telepon",
+          "type": "tel",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:20"
+          ]
+        },
+        {
+          "name": "tanggal_lahir",
+          "type": "date",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "date"
+          ]
+        },
+        {
+          "name": "alamat",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "in:userb,userk,admin"
+          ]
+        },
+        {
+          "name": "image",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "users"
+      ]
+    },
+    {
+      "id": "txn_160",
+      "method": "DELETE",
+      "endpoint": "/admin/users/{user}",
+      "description": "Delete admin user and associated image",
       "requires_auth": true,
       "requires_csrf": true,
       "csrf_field_name": "_token",
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "chatbot",
-        "api"
+        "admin",
+        "users"
       ]
     },
     {
-      "id": "txn_105",
+      "id": "txn_161",
       "method": "GET",
-      "endpoint": "/api/chatbot/conversations",
-      "description": "Get user's conversation history list",
+      "endpoint": "/admin/survey-documents",
+      "description": "Admin survey documents index",
       "requires_auth": true,
       "requires_csrf": false,
       "csrf_field_name": null,
       "fields": [],
       "framework": "laravel",
       "tags": [
-        "chatbot",
-        "api"
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_162",
+      "method": "GET",
+      "endpoint": "/admin/survey-documents/create",
+      "description": "Admin survey document creation form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_163",
+      "method": "POST",
+      "endpoint": "/admin/survey-documents",
+      "description": "Create new survey document with thumbnail and PDF upload",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "numeric",
+            "min:2000",
+            "max:2100"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_164",
+      "method": "GET",
+      "endpoint": "/admin/survey-documents/{id}",
+      "description": "Show specific survey document",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_165",
+      "method": "GET",
+      "endpoint": "/admin/survey-documents/{id}/edit",
+      "description": "Edit survey document form",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_166",
+      "method": "PUT",
+      "endpoint": "/admin/survey-documents/{id}",
+      "description": "Update existing survey document with optional file replacements",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [
+        {
+          "name": "nama",
+          "type": "text",
+          "required": true,
+          "description": "",
+          "validation_rules": [
+            "required",
+            "string",
+            "max:255"
+          ]
+        },
+        {
+          "name": "tahun",
+          "type": "number",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "numeric",
+            "min:2000",
+            "max:2100"
+          ]
+        },
+        {
+          "name": "deskripsi",
+          "type": "text",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "string",
+            "max:1000"
+          ]
+        },
+        {
+          "name": "foto",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "image",
+            "mimes:jpeg,png,jpg",
+            "max:2048"
+          ]
+        },
+        {
+          "name": "file",
+          "type": "file",
+          "required": false,
+          "description": "",
+          "validation_rules": [
+            "nullable",
+            "file",
+            "mimes:pdf",
+            "max:10240"
+          ]
+        }
+      ],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_167",
+      "method": "DELETE",
+      "endpoint": "/admin/survey-documents/{id}",
+      "description": "Delete survey document and associated files",
+      "requires_auth": true,
+      "requires_csrf": true,
+      "csrf_field_name": "_token",
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
+      ]
+    },
+    {
+      "id": "txn_168",
+      "method": "GET",
+      "endpoint": "/admin/survey-documents/{id}/download",
+      "description": "Download survey document PDF file",
+      "requires_auth": true,
+      "requires_csrf": false,
+      "csrf_field_name": null,
+      "fields": [],
+      "framework": "laravel",
+      "tags": [
+        "admin",
+        "survey-documents"
       ]
     }
   ],
-  "total_routes": 105,
-  "post_routes": 47,
-  "csrf_protected_routes": 47,
-  "auth_required_routes": 89,
+  "total_routes": 168,
+  "post_routes": 52,
+  "csrf_protected_routes": 52,
+  "auth_required_routes": 165,
   "error": null
 }

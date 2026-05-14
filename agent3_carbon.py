@@ -117,13 +117,14 @@ def get_csrf_token(
                         import urllib.parse
                         decoded_cookie = urllib.parse.unquote(raw_cookie)
                         
-                        # Laravel security: Encrypted cookies (eyJpdi...) cannot be used in body _token fields.
-                        # They only work as headers. We only return it if it looks like a plain string.
-                        if not decoded_cookie.startswith("eyJpdiI6"):
-                            print(f"[Agent 2] [DEBUG] Found plain CSRF in cookies ({cookie_name})", flush=True)
+                        # Laravel security: Encrypted cookies (eyJpdi...) are common.
+                        # We use them as headers (X-XSRF-TOKEN).
+                        if decoded_cookie.startswith("eyJpdiI6"):
+                            print(f"[Agent 3] [DEBUG] Found encrypted Laravel CSRF cookie ({cookie_name}).", flush=True)
                             return decoded_cookie, True
                         else:
-                            print(f"[Agent 3] [DEBUG] Skipping encrypted cookie {cookie_name} for form field.", flush=True)
+                            print(f"[Agent 2] [DEBUG] Found plain CSRF in cookies ({cookie_name})", flush=True)
+                            return decoded_cookie, True
 
                 # 3. Check response headers
                 for header_name in ["X-CSRF-Token", "X-XSRF-Token", "CSRF-Token"]:
@@ -246,9 +247,11 @@ def run_transaction(
             print(f"[Agent 3] │  └─ ♻️ Using session-cached CSRF token.", flush=True)
 
         if csrf_token:
+            # Laravel specifically looks for X-XSRF-TOKEN (often the encrypted cookie value)
+            # or X-CSRF-TOKEN (the plain token). We send both to be safe.
             session.headers.update({
-                "X-CSRF-Token": csrf_token,
-                "X-XSRF-Token": csrf_token,
+                "X-CSRF-TOKEN": csrf_token,
+                "X-XSRF-TOKEN": csrf_token,
             })
 
     print(f"[Agent 3] ├─ Step 2: Preparing automated test payload...", flush=True)
