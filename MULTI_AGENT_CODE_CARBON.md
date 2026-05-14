@@ -141,7 +141,7 @@ brew install jq
 
 ```bash
 # .env
-GEMINI_API_KEY=your_gemini_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 TARGET_BASE_URL=http://localhost:8000   # URL app yang sedang running
 REPOMIX_OUTPUT_DIR=./output
 REPORT_OUTPUT_DIR=./reports

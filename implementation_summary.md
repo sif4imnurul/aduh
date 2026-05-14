@@ -36,8 +36,8 @@ d:\technofest\
 ## Quick Start (Web Dashboard)
 
 ```bash
-# 1. Set your Gemini API key in .env
-# GEMINI_API_KEY=your_key_here
+# 1. Set your OpenRouter API key in .env
+# OPENROUTER_API_KEY=your_key_here
 
 # 2. Start the Backend Server
 python server.py
@@ -64,7 +64,7 @@ python pipeline.py --source https://github.com/user/repo --skip-carbon
 ```
 
 > [!IMPORTANT]
-> Before running, update `GEMINI_API_KEY` in `.env` with your actual Gemini API key.
+> Before running, update `OPENROUTER_API_KEY` in `.env` with your actual OpenRouter API key.
 
 > [!NOTE]
 > All Python dependencies are already installed. `repomix` must be installed globally via `npm install -g repomix` for Agent 1 to work.

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green-Code Pipeline Dashboard</title>
+    <title>Repolution Pipeline Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
@@ -83,6 +83,10 @@
             display: none;
         }
 
+        #step6::before {
+            display: none !important;
+        }
+
         .step-icon {
             position: absolute;
             left: 0;
@@ -101,27 +105,12 @@
 
         .step-active .step-icon {
             border-color: #0f172a;
-            background-color: #ffffff;
-        }
-
-        .step-active .step-icon::after {
-            content: '';
-            width: 0.4rem;
-            height: 0.4rem;
-            border-radius: 50%;
-            background-color: #0f172a;
+            background-color: #e2e8f0;
         }
 
         .step-done .step-icon {
             border-color: #0f172a;
             background-color: #0f172a;
-        }
-
-        .step-done .step-icon::after {
-            content: '✓';
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
         }
 
         .step-done::before {
@@ -130,7 +119,7 @@
 
         .spinner {
             border: 2px solid #e2e8f0;
-            border-top: 2px solid #0f172a;
+            border-top: 2px solid #3b82f6; /* blue-500 */
             border-radius: 50%;
             width: 1rem;
             height: 1rem;
@@ -271,17 +260,23 @@
             opacity: 1;
             transition: opacity 0.5s ease;
         }
+
+        /* Shrink console to keep previous logs compact while allowing retry logs */
+        .shrink {
+            max-height: 6rem;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="mainApp" class="flex flex-col min-h-screen">
+    <div id="mainApp" class="flex flex-col min-h-screen w-full">
 
         <!-- Corporate Navbar -->
         <header
-            class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 lg:px-10 z-10 sticky top-0">
-            <h1 class="text-slate-800 font-semibold text-lg tracking-tight">Green-Code Engine</h1>
+            class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 lg:px-10 z-10 sticky top-0 shadow-sm">
+            <h1 class="text-slate-800 font-semibold text-lg tracking-tight">Repolution Engine</h1>
             <span class="text-sm font-medium text-slate-500">v1.2 Enterprise</span>
         </header>
 
@@ -290,7 +285,7 @@
 
             <!-- Left Column: Configuration -->
             <div class="lg:col-span-1">
-                <div id="configCard" class="bg-white border border-slate-200 rounded-xl p-6 flex flex-col">
+                <div id="configCard" class="bg-white border border-slate-200 rounded-xl p-6 flex flex-col shadow-md">
                     <h2 class="text-base font-semibold text-slate-800 mb-1">Konfigurasi Analisis</h2>
                     <p class="text-xs text-slate-500 mb-6">Tentukan target repositori untuk audit efisiensi.</p>
 
@@ -306,14 +301,7 @@
                     </div>
 
                     <div class="mt-5 bg-slate-50 rounded-lg p-3.5 border border-slate-200">
-                        <h3 class="text-[11px] font-semibold text-slate-800 mb-2 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Panduan Pemakaian
-                        </h3>
+                        <h3 class="text-[11px] font-semibold text-slate-800 mb-2">Panduan Pemakaian</h3>
                         <ul class="text-[10px] text-slate-600 space-y-1.5 leading-relaxed pl-0.5">
                             <li class="flex gap-1.5 items-start"><span class="text-slate-400 mt-0.5">•</span>
                                 <span>Pastikan aplikasi sudah <strong>dijalankan secara lokal</strong> (running) pada
@@ -335,7 +323,7 @@
             <!-- Right Column: Pipeline Execution -->
             <div class="lg:col-span-3">
                 <div id="executionPanel"
-                    class="bg-white border border-slate-200 rounded-xl p-6 opacity-50 pointer-events-none transition-opacity duration-300 flex flex-col">
+                    class="bg-white border border-slate-200 rounded-xl p-6 opacity-50 pointer-events-none transition-opacity duration-300 flex flex-col shadow-md">
                     <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
                         <h2 class="text-base font-semibold text-slate-800">Log Eksekusi</h2>
                         <span id="pipelineStatus"
@@ -349,14 +337,11 @@
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">1. Pemindaian Repositori</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menganalisis arsitektur dan
-                                        memetakan
-                                        seluruh basis kode proyek Anda.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Pemindaian Basis Kode</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Memindai dan merapikan seluruh basis kode sebelum analisis berikutnya.</p>
                                 </div>
                                 <span id="s1-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Memindai...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
                         </div>
 
@@ -365,16 +350,11 @@
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">2. Analisis Kecerdasan Buatan
-                                        (AI)
-                                    </h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menggunakan kecerdasan buatan
-                                        untuk
-                                        mendeteksi celah dan titik rawan efisiensi.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Analisis Repositori</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Membaca struktur repo dan menandai area yang perlu dianalisis.</p>
                                 </div>
                                 <span id="s2-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Menganalisis...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
                             <!-- Activity Log for Agent 2 -->
                             <div id="s2-console" class="mt-3 bg-slate-50 border border-slate-200 rounded-md p-3 hidden font-mono text-[11px] text-slate-600 max-h-32 overflow-y-auto">
@@ -387,14 +367,11 @@
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">3. Uji Beban Emisi Karbon</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Melakukan stress-test pada
-                                        API untuk
-                                        mengkalkulasi pemakaian energi & jejak karbon aktual.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Pengukuran Energi</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Mengukur beban eksekusi dan jejak karbon dari endpoint aktif.</p>
                                 </div>
                                 <span id="s3-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Menguji (0/32)...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
 
                             <!-- Table output for Agent 3 -->
@@ -427,6 +404,9 @@
                                         <span>CO₂: <span id="s3-tot-co2" class="font-bold">0.00</span> g</span>
                                     </div>
                                 </div>
+                                <div id="carbon-compare" class="bg-white p-3 text-sm text-slate-700 border-t border-slate-100 hidden">
+                                    <!-- populated dynamically after refactor -->
+                                </div>
                             </div>
                         </div>
 
@@ -435,12 +415,11 @@
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">4. AI Code Refactoring</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Melakukan optimasi kode otomatis pada bagian yang terdeteksi tidak efisien.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Analisis Fungsi</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menganalisis fungsi dan relasi logika yang paling layak diprioritaskan.</p>
                                 </div>
                                 <span id="s4-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Merefaktor...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
                             <!-- Activity Log for Agent 4 -->
                             <div id="s4-console" class="mt-3 bg-slate-900 border border-slate-700 rounded-md p-3 hidden font-mono text-[11px] text-blue-300 max-h-32 overflow-y-auto">
@@ -453,12 +432,11 @@
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">5. Optimization Validator</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Memvalidasi hasil refactor untuk memastikan integritas sistem tetap terjaga.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Refactor & Validasi</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menerapkan perbaikan fungsi dan memvalidasi hasilnya dalam satu alur.</p>
                                 </div>
                                 <span id="s5-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Memvalidasi...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
                             <!-- Activity Log for Agent 5 -->
                             <div id="s5-console" class="mt-3 bg-slate-50 border border-slate-200 rounded-md p-3 hidden font-mono text-[11px] text-slate-600">
@@ -467,16 +445,15 @@
                         </div>
 
                         <!-- Agent 6 -->
-                        <div id="step6" class="step-item pb-0">
+                        <div id="step6" class="step-item">
                             <div class="step-icon"></div>
                             <div class="flex items-start justify-between w-full">
                                 <div>
-                                    <h4 class="text-base font-semibold text-slate-800">6. Penyusunan Laporan Akhir</h4>
-                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menyusun hasil akhir, riwayat refactor, dan rekomendasi optimasi.</p>
+                                    <h4 class="text-base font-semibold text-slate-800">Buat Laporan</h4>
+                                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Menyusun hasil akhir, riwayat optimasi, dan ringkasan temuan.</p>
                                 </div>
                                 <span id="s6-msg"
-                                    class="text-sm font-medium text-slate-700 hidden flex items-center gap-2 pr-4"><span
-                                        class="spinner"></span> Menyusun...</span>
+                                    class="text-sm font-medium text-slate-700 hidden pr-4"></span>
                             </div>
                         </div>
 
@@ -485,15 +462,9 @@
                                 <div
                                     class="p-4 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
                                     <div>
-                                        <p class="text-sm font-semibold text-slate-800">Analisis & Optimasi Selesai!</p>
-                                        <p class="text-xs text-slate-500 mt-0.5">Laporan diagnostik, hasil refactor, dan status validasi
-                                            telah berhasil disusun.</p>
+                                        <p class="text-sm font-semibold text-slate-800">Proses Repolution Selesai</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Laporan diagnostik, hasil optimasi, dan status validasi telah berhasil disusun.</p>
                                     </div>
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -506,7 +477,7 @@
         <div id="reportView" class="hidden-view w-full px-6 lg:px-10 pb-12 mt-4">
 
             <div class="report-header">
-                <h1 class="text-2xl font-bold mb-1 tracking-tight">Laporan Diagnostik Optimasi Kode</h1>
+                <h1 class="text-2xl font-bold mb-1 tracking-tight">Laporan Diagnostik Repolution</h1>
                 <div class="opacity-70 text-sm font-mono">ID: REF-882-SYS</div>
             </div>
 
@@ -530,6 +501,39 @@
                     <div class="number text-slate-500">4</div>
                     <div class="text-[10px] text-slate-500 font-semibold mt-1 uppercase tracking-wider">Prioritas
                         Menengah</div>
+                </div>
+            </div>
+
+            <!-- Carbon Efficiency Comparison -->
+            <div class="hotspot mb-6 bg-gradient-to-br from-slate-50 to-slate-100">
+                <div class="hotspot-header">
+                    <span class="severity-badge severity-HIGH">EFISIENSI</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Perbandingan Jejak Karbon</h3>
+                        <div class="text-xs text-slate-500 mt-0.5">Sebelum dan sesudah optimasi</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-white p-4 rounded border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase mb-2">Sebelum Refactor</div>
+                        <div class="text-2xl font-bold text-slate-800" id="report-pre-energy">0.00</div>
+                        <div class="text-sm text-slate-600">Energi (mWh)</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-2" id="report-pre-co2">0.00</div>
+                        <div class="text-sm text-slate-600">CO₂ (g)</div>
+                    </div>
+                    <div class="bg-white p-4 rounded border border-slate-200">
+                        <div class="text-xs font-semibold text-slate-500 uppercase mb-2">Sesudah Refactor</div>
+                        <div class="text-2xl font-bold text-slate-800" id="report-post-energy">0.00</div>
+                        <div class="text-sm text-slate-600">Energi (mWh)</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-2" id="report-post-co2">0.00</div>
+                        <div class="text-sm text-slate-600">CO₂ (g)</div>
+                    </div>
+                </div>
+
+                <div id="report-savings" class="bg-white p-4 rounded border border-slate-200">
+                    <div class="text-sm font-semibold text-slate-700 mb-2">Hasil Penghematan</div>
+                    <div class="text-sm text-slate-600" id="report-savings-text">Menghitung...</div>
                 </div>
             </div>
 
@@ -695,6 +699,14 @@
         });
 
         async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+        // Retry counter for validation loop
+        let retryCount = 0;
+        const maxRetries = 3;
+        // Carbon comparison snapshots
+        let preRefactorEnergy = 0;
+        let preRefactorCo2 = 0;
+        let postRefactorEnergy = 0;
+        let postRefactorCo2 = 0;
 
         function updateStep(stepId, state, msgText) {
             const el = document.getElementById(`step${stepId}`);
@@ -703,10 +715,10 @@
             if (state === 'active') {
                 el.classList.add('step-active');
                 msgEl.classList.remove('hidden');
-                if (msgText) msgEl.innerHTML = `<span class="spinner"></span> ${msgText}`;
+                msgEl.textContent = msgText || '';
             } else if (state === 'done') {
                 el.classList.replace('step-active', 'step-done');
-                msgEl.innerHTML = `<span class="text-slate-800 font-semibold">Selesai</span>`;
+                msgEl.textContent = 'Selesai';
             }
         }
 
@@ -722,35 +734,47 @@
 
             // Reset
             for (let i = 1; i <= 6; i++) {
-                document.getElementById(`step${i}`).className = 'step-item' + (i === 6 ? ' pb-0' : '');
+                document.getElementById(`step${i}`).className = 'step-item' + (i === 6 ? '' : '');
                 document.getElementById(`s${i}-msg`).classList.add('hidden');
-                const console = document.getElementById(`s${i}-console`);
-                if (console) console.classList.add('hidden');
+                const panelConsole = document.getElementById(`s${i}-console`);
+                if (panelConsole) panelConsole.classList.add('hidden');
                 const log = document.getElementById(`s${i}-log-content`);
                 if (log) log.innerHTML = '';
             }
             document.getElementById('s6-action').classList.add('hidden');
             const consoleEl = document.getElementById('s3-console');
             consoleEl.classList.add('hidden');
+            // Reset carbon values in report
+            document.getElementById('report-pre-energy').innerText = '0.00';
+            document.getElementById('report-pre-co2').innerText = '0.00';
+            document.getElementById('report-post-energy').innerText = '0.00';
+            document.getElementById('report-post-co2').innerText = '0.00';
+            document.getElementById('report-savings-text').innerText = 'Menghitung...';
+            // Reset global carbon tracking
+            preRefactorEnergy = 0;
+            preRefactorCo2 = 0;
+            postRefactorEnergy = 0;
+            postRefactorCo2 = 0;
+            retryCount = 0;
             // Do not clear innerHTML here because it will destroy the table layout
 
             // Step 1
-            updateStep(1, 'active', 'Memindai kerangka proyek...');
+            updateStep(1, 'active', 'Memindai kerangka proyek');
             await wait(2800);
             updateStep(1, 'done');
 
-            // Step 2: AI Analysis
-            updateStep(2, 'active', 'Mengirim konteks ke AI...');
+            // Step 2: Repo Analysis
+            updateStep(2, 'active', 'Membaca struktur repositori');
             const s2Console = document.getElementById('s2-console');
             const s2Log = document.getElementById('s2-log-content');
             s2Console.classList.remove('hidden');
             
             const discoveryLogs = [
-                "Found Route: GET /login", "Found Route: POST /login",
-                "Found Route: GET /home", "Found Route: GET /grid-agenda",
-                "Analysing UserController.php...", "Inefficiency detected in UserController.php:L45",
-                "Found Route: GET /logo", "Analysing AgendaController.php...",
-                "Inefficiency detected in AgendaController.php:L102"
+                "Mendeteksi route GET /login", "Mendeteksi route POST /login",
+                "Mendeteksi route GET /home", "Mendeteksi route GET /grid-agenda",
+                "Membaca UserController.php", "Temuan inefisiensi pada UserController.php:L45",
+                "Mendeteksi route GET /logo", "Membaca AgendaController.php",
+                "Temuan inefisiensi pada AgendaController.php:L102"
             ];
 
             for (const log of discoveryLogs) {
@@ -797,7 +821,7 @@
             ];
 
             const totalEndpoints = staticEndpoints.length;
-            updateStep(3, 'active', `Menguji (${0}/${totalEndpoints})...`);
+            updateStep(3, 'active', `Menguji ${0}/${totalEndpoints}`);
             consoleEl.classList.remove('hidden');
 
             let totEnergy = 0;
@@ -808,11 +832,11 @@
 
             for (let i = 0; i < totalEndpoints; i++) {
                 const ep = staticEndpoints[i];
-                document.getElementById(`s3-msg`).innerHTML = `<span class="spinner"></span> Menguji (${i + 1}/${totalEndpoints})...`;
+                document.getElementById(`s3-msg`).textContent = `Menguji ${i + 1}/${totalEndpoints}`;
 
                 const ms = ep.ms;
-                const energy = ms * 0.0001;
-                const co2 = ms * 0.00003;
+                const energy = ms * 0.005;  // Scaled up for realistic metrics
+                const co2 = ms * 0.0015;    // Scaled up accordingly
 
                 totEnergy += energy;
                 totCo2 += co2;
@@ -841,50 +865,138 @@
             document.getElementById('s3-tot-co2').innerText = totCo2.toFixed(3);
             document.getElementById('s3-summary').classList.remove('hidden');
 
+            // store pre-refactor snapshot for later comparison
+            preRefactorEnergy = totEnergy;
+            preRefactorCo2 = totCo2;
+
             updateStep(3, 'done');
 
-            // Step 4: Refactor
-            updateStep(4, 'active', 'Menganalisis pola inefisiensi...');
+            // Step 4: Function Analysis
+            updateStep(4, 'active', 'Menganalisis fungsi dan relasi');
             const s4Console = document.getElementById('s4-console');
             const s4Log = document.getElementById('s4-log-content');
             s4Console.classList.remove('hidden');
 
-            const refactorTasks = [
-                "Applying Eager Loading in UserController.php...",
-                "Optimizing Date Range Query in AgendaController.php...",
-                "Implementing Pagination in LogoController.php...",
-                "Refactor complete for 3 locations."
+            const analysisFuncTasks = [
+                "Memetakan fungsi berat di UserController.php",
+                "Mengelompokkan query rentang tanggal di AgendaController.php",
+                "Menandai kandidat optimasi pagination di LogoController.php",
+                "Analisis fungsi selesai untuk 3 area prioritas"
             ];
 
-            for (const task of refactorTasks) {
-                s4Log.innerHTML += `<div class="py-0.5"><span class="text-blue-500">$</span> ${task}</div>`;
+            for (const task of analysisFuncTasks) {
+                s4Log.innerHTML += `<div class="py-0.5">${task}</div>`;
                 s4Console.scrollTop = s4Console.scrollHeight;
                 await wait(1200);
             }
             updateStep(4, 'done');
 
-            // Step 5: Validator
-            updateStep(5, 'active', 'Menjalankan unit test & validasi...');
+            // Step 5: Refactor + Validator (with simulated error & retry)
             const s5Console = document.getElementById('s5-console');
             const s5Log = document.getElementById('s5-log-content');
             s5Console.classList.remove('hidden');
 
+            // Add interactive controls to RefactorValidator console (if not present)
+            if (!document.getElementById('s5-controls')) {
+                const controls = document.createElement('div');
+                controls.id = 's5-controls';
+                controls.className = 'mb-2 flex gap-2';
+                controls.innerHTML = `
+                    <button id="btn-reanalyze" class="px-2 py-1 text-xs bg-slate-100 border rounded">Re-analyze Functions</button>
+                    <button id="btn-rerun-carbon" class="px-2 py-1 text-xs bg-slate-100 border rounded">Rerun Measurements</button>
+                `;
+                s5Console.insertBefore(controls, s5Console.firstChild);
+                document.getElementById('btn-reanalyze').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    // Manual interactive re-analysis (user triggered)
+                    await runAnalysisFunc(true);
+                });
+                document.getElementById('btn-rerun-carbon').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await rerunCodecarbonSequence(true);
+                });
+            }
+
             const validationSteps = [
-                "Running Syntax Check... ✅",
-                "Validating UserControllerRefactor... ✅",
-                "Testing Agenda Range Logic... ✅",
-                "Checking for Side Effects... ✅",
-                "Security Check (CSRF Integrity)... ✅"
+                "Pemeriksaan sintaks selesai",
+                "Validasi hasil optimasi UserController selesai",
+                "Pengujian logika rentang Agenda selesai",
+                "Pemeriksaan efek samping selesai",
+                "Pemeriksaan integritas keamanan selesai"
             ];
 
-            for (const step of validationSteps) {
-                s5Log.innerHTML += `<div class="py-0.5 border-b border-slate-100 last:border-0">${step}</div>`;
-                await wait(800);
+            // Validation loop: re-analyze + re-validate until success or max retries
+            let validationPassed = false;
+            while (!validationPassed && retryCount < maxRetries) {
+                updateStep(5, 'active', retryCount === 0 ? 'Menjalankan validasi terpadu' : `Menjalankan validasi ulang (#${retryCount})`);
+                // If first attempt, simulate partial success then failure
+                if (retryCount === 0) {
+                    for (let i = 0; i < validationSteps.length - 1; i++) {
+                        const step = validationSteps[i];
+                        s5Log.innerHTML += `<div class="py-0.5 border-b border-slate-100 last:border-0">${step}</div>`;
+                        await wait(800);
+                    }
+                    s5Log.innerHTML += `<div class="py-0.5 text-red-600 font-bold">Validasi gagal: beberapa pengujian belum lolos</div>`;
+                    await wait(1200);
+                } else {
+                    // After re-analysis attempts, perform full validation steps
+                    s5Log.innerHTML = '';
+                    for (const step of validationSteps) {
+                        s5Log.innerHTML += `<div class="py-0.5 border-b border-slate-100 last:border-0">${step}</div>`;
+                        await wait(700);
+                    }
+                    validationPassed = true;
+                }
+
+                if (!validationPassed) {
+                    // shrink step 4 console and re-run analysis
+                    const s4Console = document.getElementById('s4-console');
+                    s4Console.classList.add('shrink');
+                    updateStep(4, 'active', 'Menganalisis fungsi dan relasi ulang');
+                    s4Console.classList.remove('hidden');
+                    const s4Log = document.getElementById('s4-log-content');
+                    const analysisFuncRetryTasks = [
+                        "Memeriksa ulang fungsi berat",
+                        "Menyusun ulang relasi query",
+                        "Mengonfirmasi kandidat pagination",
+                        "Analisis ulang selesai"
+                    ];
+                    for (const task of analysisFuncRetryTasks) {
+                        s4Log.innerHTML += `<div class="py-0.5">${task}</div>`;
+                        s4Console.scrollTop = s4Console.scrollHeight;
+                        await wait(1100);
+                    }
+                    updateStep(4, 'done');
+                    retryCount += 1;
+                }
             }
+
+            // After loop ends, mark validation done and proceed
             updateStep(5, 'done');
+            // Trigger a rerun of Codecarbon to compare pre/post
+            await rerunCodecarbonSequence();
 
             // Step 6: Report
-            updateStep(6, 'active', 'Menyusun laporan akhir...');
+            updateStep(6, 'active', 'Menyusun laporan akhir');
+            
+            // Populate carbon comparison data in report
+            document.getElementById('report-pre-energy').innerText = preRefactorEnergy.toFixed(2);
+            document.getElementById('report-pre-co2').innerText = preRefactorCo2.toFixed(3);
+            document.getElementById('report-post-energy').innerText = postRefactorEnergy.toFixed(2);
+            document.getElementById('report-post-co2').innerText = postRefactorCo2.toFixed(3);
+            
+            // Calculate savings
+            const energySaving = preRefactorEnergy - postRefactorEnergy;
+            const energySavingPercent = ((energySaving / preRefactorEnergy) * 100).toFixed(1);
+            const co2Saving = preRefactorCo2 - postRefactorCo2;
+            const co2SavingPercent = ((co2Saving / preRefactorCo2) * 100).toFixed(1);
+            
+            const savingsText = energySaving > 0 
+                ? `Hemat <strong>${energySaving.toFixed(2)} mWh</strong> energi (${energySavingPercent}%) dan <strong>${co2Saving.toFixed(3)} g</strong> CO₂ (${co2SavingPercent}%) setelah optimasi.`
+                : `Tidak ada pengurangan energi signifikan, namun sistem tetap valid untuk deployment.`;
+            
+            document.getElementById('report-savings-text').innerHTML = savingsText;
+            
             await wait(3500);
             updateStep(6, 'done');
 
@@ -906,6 +1018,71 @@
                 reportView.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
         }
+
+        // Simulated AnalysisFunc runner (can be triggered manually)
+        async function runAnalysisFunc(interactive=false) {
+            updateStep(4, 'active', interactive ? 'Analisis fungsi (manual)' : 'Menganalisis fungsi dan relasi');
+            const s4Console = document.getElementById('s4-console');
+            const s4Log = document.getElementById('s4-log-content');
+            s4Console.classList.remove('hidden');
+            const tasks = [
+                'Memeriksa kompleksitas fungsi',
+                'Mendeteksi titik panas CPU',
+                'Mengusulkan optimasi memori',
+                'Analisis fungsi selesai'
+            ];
+            for (const t of tasks) {
+                s4Log.innerHTML += `<div class="py-0.5">${t}</div>`;
+                s4Console.scrollTop = s4Console.scrollHeight;
+                await wait(800);
+            }
+            updateStep(4, 'done');
+        }
+
+        // Simulated Codecarbon measurement run
+        function runCodecarbonSimulation(isPostRefactor=false) {
+            if (isPostRefactor && preRefactorEnergy > 0) {
+                // Post-refactor should be 40-65% of pre-refactor (showing improvement)
+                const reductionPercent = 0.35 + Math.random() * 0.25; // 35-60% reduction
+                const energy = preRefactorEnergy * (1 - reductionPercent);
+                const co2 = +(energy * 0.00045).toFixed(4);
+                return { energy: parseFloat(energy.toFixed(2)), co2 };
+            } else {
+                // Random baseline for initial measurement
+                const energy = Math.round(200 + Math.random() * 200);
+                const co2 = +(energy * 0.00045).toFixed(4);
+                return { energy, co2 };
+            }
+        }
+
+        // Sequence to rerun Codecarbon after RefactorValidator, compare and render summary
+        async function rerunCodecarbonSequence(manual=false) {
+            // Ensure a pre-refactor baseline exists
+            if (!preRefactorEnergy) {
+                const init = runCodecarbonSimulation(false);
+                preRefactorEnergy = init.energy;
+                preRefactorCo2 = init.co2;
+            }
+            const compArea = document.getElementById('carbon-compare');
+            compArea.classList.remove('hidden');
+            compArea.innerHTML = '<div class="text-sm text-slate-500">Menjalankan pengukuran ulang setelah refactor...</div>';
+            await wait(900);
+            // Post-refactor should show improvement
+            const post = runCodecarbonSimulation(true);
+            postRefactorEnergy = post.energy;
+            postRefactorCo2 = post.co2;
+            compArea.innerHTML = `
+                <div class="text-sm">Perbandingan Energi (mWh): <strong>${preRefactorEnergy.toFixed(2)}</strong> → <strong>${postRefactorEnergy.toFixed(2)}</strong></div>
+                <div class="text-sm">Perbandingan CO₂ (g): <strong>${preRefactorCo2.toFixed(3)}</strong> → <strong>${postRefactorCo2.toFixed(3)}</strong></div>
+            `;
+            if (postRefactorEnergy < preRefactorEnergy) {
+                compArea.innerHTML += '<div class="mt-1 text-xs text-green-700">Refactor menghasilkan pengurangan konsumsi energi.</div>';
+            } else {
+                compArea.innerHTML += '<div class="mt-1 text-xs text-amber-700">Tidak ada pengurangan signifikan setelah refactor.</div>';
+            }
+            await wait(900);
+        }
+
     </script>
 </body>
 
